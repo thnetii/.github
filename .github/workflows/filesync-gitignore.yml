@@ -1,0 +1,27 @@
+on:
+  workflow_call:
+    inputs: {}
+  workflow_dispatch:
+    inputs: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  filesync-gitignore:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout-current
+        name: Checkout ${{ github.repository }}@${{ github.ref_name || github.sha }}
+        uses: actions/checkout@v3
+      - id: git-config-user
+        uses: thnetii/.github/actions/git-user-config@main
+      - id: get-workflow-id
+        uses: thnetii/.github/actions/get-workflow-id@main
+      - id: create-branch
+        uses: thnetii/.github/actions/create-rebase-pr-branch@main
+        with:
+          branch-name: workflows/w${{ steps.get-workflow-id.outputs.workflow-id }}
+      - run: |
+          git log --graph --abbrev-commit --decorate --author-date-order  --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
