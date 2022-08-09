@@ -1,14 +1,26 @@
+/** @param {string} repository */
+function getRepoRef(repository) {
+  const slashIdx = (repository || '').indexOf('/');
+  if (slashIdx < 0) return { owner: undefined, repo: undefined };
+  return {
+    owner: repository.slice(0, slashIdx),
+    repo: repository.slice(slashIdx + 1),
+  };
+}
+
 /**
  * @param {Parameters<typeof module.exports>[0]} args
  */
-const getScriptHelper = ({ github, context }) => ({
-  /** @param {string} ref */
-  async existsRef(ref) {
+const getScriptHelper = ({ github, context, inputs }) => ({
+  async existsRef() {
+    const { owner = context.repo.owner, repo = context.repo.repo } = getRepoRef(
+      inputs.repository
+    );
     try {
       await github.rest.git.getRef({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        ref,
+        owner,
+        repo,
+        ref: `heads/${inputs['branch-name']}`,
       });
     } catch (err) {
       const reqError =
@@ -29,28 +41,43 @@ const getScriptHelper = ({ github, context }) => ({
  *  context: import('@actions/github/lib/context').Context,
  *  core: import('@actions/core'),
  *  exec: import('@actions/exec'),
- *  branchName: string,
- *  upstreamSha: string,
+ *  inputs: {
+ *    'branch-name': string,
+ *    'repository': string,
+ *    'upstream-sha': string,
+ *    'working-directory': string,
+ *  },
  * }} args
  */
 module.exports = async (args) => {
   const {
-    branchName,
     context: { sha: ctxSha },
-    upstreamSha,
     exec: { exec },
+    inputs: {
+      'branch-name': branchName,
+      'upstream-sha': upstreamSha,
+      'working-directory': workDir,
+    },
   } = args;
+  const sha = upstreamSha || ctxSha;
   const scriptHelper = getScriptHelper(args);
-  const branchExists = await scriptHelper.existsRef(`heads/${branchName}`);
+  const branchExists = await scriptHelper.existsRef();
+  /** @type {import('@actions/exec').ExecOptions} */
+  const execOpts = {
+    cwd: workDir,
+  };
   if (branchExists) {
-    await exec('git', ['fetch', 'origin', `${branchName}:${branchName}`]);
-    await exec('git', [
-      'rebase',
-      '--strategy-option=ours',
-      upstreamSha || ctxSha,
-      branchName,
-    ]);
+    await exec(
+      'git',
+      ['fetch', 'origin', `${branchName}:${branchName}`],
+      execOpts
+    );
+    await exec(
+      'git',
+      ['rebase', '--strategy-option=ours', sha, branchName],
+      execOpts
+    );
   } else {
-    await exec('git', ['checkout', '-B', branchName, upstreamSha || ctxSha]);
+    await exec('git', ['checkout', '-B', branchName, sha], execOpts);
   }
 };

@@ -5,10 +5,19 @@ inputs:
   branch-name:
     required: true
     description: ''
+  repository:
+    required: false
+    default: ${{ github.repository }}
+    description: ''
   upstream-sha:
     required: false
     default: ${{ github.sha }}
     description: ''
+  working-directory:
+    required: false
+    default: ${{ github.workspace }}
+    description: ''
+
 runs:
   using: composite
   steps:
@@ -19,12 +28,10 @@ runs:
           require(process.env['GITHUB_ACTION_PATH'])(
             {
               github, context, core, exec,
-              branchName: process.env['ACTION_INPUT_BRANCHNAME'],
-              upstreamSha: process.env['ACTION_INPUT_UPSTREAMSHA'],
+              inputs: JSON.parse(process.env['ACTION_INPUTS_JSON']),
             }
           );
       env:
-        ACTION_INPUT_BRANCHNAME: ${{ inputs.branch-name }}
-        ACTION_INPUT_UPSTREAMSHA: ${{ inputs.upstream-sha }}
+        ACTION_INPUTS_JSON: ${{ toJson(inputs) }}
         GITHUB_ACTION_PATH: ${{ github.action_path }}
 outputs: {}
