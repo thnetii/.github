@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    open-pull-requests-limit: 50
+    schedule:
+      interval: daily
+    reviewers:
+      - thnetii/organization
