@@ -1,0 +1,22 @@
+{
+  "name": "@thnetii/gh-actions-workspace-root",
+  "version": "0.0.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thnetii/.github.git"
+  },
+  "author": "TH-NETII Rasch Solutions <fredrik.rasch@gmail.com> (https://thnetii.td.org.uit.no)",
+  "maintainers": [
+    "Fredrik Høisæther Rasch <fredrik.rasch@gmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/thnetii/.github/issues"
+  },
+  "homepage": "https://github.com/thnetii/.github#readme",
+  "license": "MIT",
+  "workspaces": [
+    "actions/*"
+  ],
+  "scripts": {}
+}

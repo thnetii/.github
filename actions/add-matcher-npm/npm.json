@@ -1,0 +1,25 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "npm-error",
+      "severity": "error",
+      "pattern": [
+        {
+          "regexp": "^npm\\s+ERR!\\s+(.*)$",
+          "message": 1
+        }
+      ]
+    },
+    {
+      "owner": "npm-warn",
+      "severity": "warning",
+      "pattern": [
+        {
+          "regexp": "^npm\\s+WARN\\s+(\\S+)\\s+(.*)$",
+          "code": 1,
+          "message": 2
+        }
+      ]
+    }
+  ]
+}

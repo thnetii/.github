@@ -1,0 +1,17 @@
+name: '@thnetii/gh-actions-get-workflow-id'
+author: thnetii
+description: ''
+runs:
+  using: composite
+  steps:
+    - id: get-workflow-id
+      uses: actions/github-script@v6
+      with:
+        script: |
+          require('${{ github.action_path }}')(
+            { github, context, core }
+          );
+outputs:
+  workflow-id:
+    description: The unique Id of the GitHub Actions workflow that is currently running.
+    value: ${{ steps.get-workflow-id.outputs.workflow-id }}

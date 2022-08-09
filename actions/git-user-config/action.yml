@@ -1,0 +1,25 @@
+name: '@thnetii/gh-actions-git-user-config'
+author: thnetii
+description: 'Configures git user details within the workflow runner or current repository so that subsequent actions can perform commits using the git cli.'
+inputs:
+  user-name:
+    default: 'github-actions'
+    description: 'Specifies the user display name to use for Git commits'
+    required: false
+  user-email:
+    default: 'github-actions@github.com'
+    description: 'Specifies the user email address to use for Git commits'
+    required: false
+  config-global:
+    default: 'false'
+    description: 'When true, instructs git to configure the user details globally for the workflow runner. Default or false will only configure the repository at the specified working directory'
+    required: false
+  working-directory:
+    default: ${{ github.workspace }}
+    description: 'The working directory in which to configure the user details.'
+    required: false
+runs:
+  using: node16
+  pre: setup.js
+  main: action.js
+  post: unset.js

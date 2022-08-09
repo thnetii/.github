@@ -1,0 +1,44 @@
+{
+  "name": "@thnetii/eslint-formatter-gh-actions",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thnetii/.github.git",
+    "directory": "!WRKSP:\\=/!"
+  },
+  "keywords": [
+    "ghactions",
+    "gh-actions",
+    "github-actions",
+    "eslint-formatter"
+  ],
+  "author": {
+    "name": "TH-NETII Rasch Solutions",
+    "email": "fredrik.rasch@gmail.com",
+    "url": "https://thnetii.td.org.uit.no"
+  },
+  "maintainers": [
+    "Fredrik Høisæther Rasch <fredrik.rasch@gmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/thnetii/.github/issues"
+  },
+  "homepage": "https://github.com/thnetii/.github#readme",
+  "license": "MIT",
+  "files": [
+    "action.yml",
+    "setup.js"
+  ],
+  "main": "formatter.js",
+  "type": "commonjs",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "eslint-formatter-stylish": "^8.3.0"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.3.0"
+  },
+  "peerDependencies": {
+    "eslint": ">=7"
+  }
+}

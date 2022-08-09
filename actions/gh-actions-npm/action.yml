@@ -1,0 +1,15 @@
+name: '@thnetii/gh-actions-npm'
+author: thnetii
+description: ''
+inputs:
+  arguments:
+    required: true
+    description: ''
+  working-directory:
+    default: ${{ github.workspace }}
+    description: ''
+    required: false
+runs:
+  using: node16
+  pre: setup.js
+  main: action.js

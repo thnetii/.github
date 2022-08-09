@@ -1,0 +1,37 @@
+{
+  "name": "@thnetii/gh-actions-npm",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thnetii/.github.git",
+    "directory": "!WRKSP:\\=/!"
+  },
+  "keywords": [
+    "ghactions",
+    "gh-actions",
+    "github-actions"
+  ],
+  "author": {
+    "name": "TH-NETII Rasch Solutions",
+    "email": "fredrik.rasch@gmail.com",
+    "url": "https://thnetii.td.org.uit.no"
+  },
+  "maintainers": [
+    "Fredrik Høisæther Rasch <fredrik.rasch@gmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/thnetii/.github/issues"
+  },
+  "homepage": "https://github.com/thnetii/.github#readme",
+  "license": "MIT",
+  "files": [
+    "action.yml",
+    "setup.js"
+  ],
+  "main": "action.js",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/exec": "^1.1.1",
+    "@thnetii/gh-actions-core-helpers": "*"
+  }
+}
