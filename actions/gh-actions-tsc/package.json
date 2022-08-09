@@ -30,7 +30,7 @@
   ],
   "main": "action.js",
   "dependencies": {
-    "@actions/core": "^1.6.0",
+    "@actions/core": "^1.9.1",
     "@actions/exec": "^1.1.1",
     "@thnetii/gh-actions-core-helpers": "*",
     "setup-node": "github:actions/setup-node#v3.4.1"
