@@ -8,9 +8,11 @@ runs:
       uses: actions/github-script@v6.1.0
       with:
         script: |
-          require('${{ github.action_path }}')(
+          require(process.env['GITHUB_ACTION_PATH'])(
             { github, context, core }
           );
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
 outputs:
   workflow-id:
     description: The unique Id of the GitHub Actions workflow that is currently running.

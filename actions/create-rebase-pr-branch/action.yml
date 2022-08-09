@@ -1,0 +1,30 @@
+name: '@thnetii/gh-actions-create-rebase-pr-branch'
+author: thnetii
+description: ''
+inputs:
+  branch-name:
+    required: true
+    description: ''
+  upstream-sha:
+    required: false
+    default: ${{ github.sha }}
+    description: ''
+runs:
+  using: composite
+  steps:
+    - id: create-rebase-pr-branch
+      uses: actions/github-script@v6.1.0
+      with:
+        script: |
+          require(process.env['GITHUB_ACTION_PATH'])(
+            {
+              github, context, core, exec,
+              branchName: process.env['ACTION_INPUT_BRANCHNAME'],
+              upstreamSha: process.env['ACTION_INPUT_UPSTREAMSHA'],
+            }
+          );
+      env:
+        ACTION_INPUT_BRANCHNAME: ${{ inputs.branch-name }}
+        ACTION_INPUT_UPSTREAMSHA: ${{ inputs.upstream-sha }}
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+outputs: {}
