@@ -5,7 +5,7 @@ runs:
   using: composite
   steps:
     - id: get-workflow-id
-      uses: actions/github-script@v6
+      uses: actions/github-script@v6.1.0
       with:
         script: |
           require('${{ github.action_path }}')(
