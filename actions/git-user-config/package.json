@@ -4,7 +4,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thnetii/.github.git",
-    "directory": "!WRKSP:\\=/!"
+    "directory": "actions/git-user-config"
   },
   "keywords": [
     "ghactions",
