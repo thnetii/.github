@@ -9,10 +9,6 @@ inputs:
     required: false
     default: ${{ github.repository }}
     description: ''
-  upstream-sha:
-    required: false
-    default: ${{ github.sha }}
-    description: ''
   working-directory:
     required: false
     default: ${{ github.workspace }}

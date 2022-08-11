@@ -51,15 +51,9 @@ const getScriptHelper = ({ github, context, inputs }) => ({
  */
 module.exports = async (args) => {
   const {
-    context: { sha: ctxSha },
     exec: { exec },
-    inputs: {
-      'branch-name': branchName,
-      'upstream-sha': upstreamSha,
-      'working-directory': workDir,
-    },
+    inputs: { 'branch-name': branchName, 'working-directory': workDir },
   } = args;
-  const sha = upstreamSha || ctxSha;
   const scriptHelper = getScriptHelper(args);
   const branchExists = await scriptHelper.existsRef();
   /** @type {import('@actions/exec').ExecOptions} */
@@ -69,15 +63,25 @@ module.exports = async (args) => {
   if (branchExists) {
     await exec(
       'git',
+      ['checkout', '-B', 'tmp/create-rebase-branch-upstream'],
+      execOpts
+    );
+    await exec(
+      'git',
       ['fetch', 'origin', `${branchName}:${branchName}`],
       execOpts
     );
     await exec(
       'git',
-      ['rebase', '--strategy-option=theirs', sha, branchName],
+      [
+        'rebase',
+        '--strategy-option=theirs',
+        'tmp/create-rebase-branch-upstream',
+        branchName,
+      ],
       execOpts
     );
   } else {
-    await exec('git', ['checkout', '-B', branchName, sha], execOpts);
+    await exec('git', ['checkout', '-B', branchName], execOpts);
   }
 };
