@@ -74,7 +74,7 @@ module.exports = async (args) => {
     );
     await exec(
       'git',
-      ['rebase', '--strategy-option=ours', sha, branchName],
+      ['rebase', '--strategy-option=theirs', sha, branchName],
       execOpts
     );
   } else {
