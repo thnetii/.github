@@ -32,7 +32,7 @@
   "main": "formatter.js",
   "type": "commonjs",
   "dependencies": {
-    "@actions/core": "^1.6.0",
+    "@actions/core": "^1.9.1",
     "eslint-formatter-stylish": "^8.3.0"
   },
   "devDependencies": {
