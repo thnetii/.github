@@ -20,6 +20,6 @@
   ],
   "main": "action.js",
   "devDependencies": {
-    "github-script": "github:actions/github-script#v6.1.1"
+    "github-script": "github:actions/github-script#v6.3.0"
   }
 }
