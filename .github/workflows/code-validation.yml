@@ -60,3 +60,15 @@ jobs:
       #   run: npm clean-install --workspace .submodules/GitHub/thnetii/eslint-config/src/eslint-config-node-base --omit=dev
       - name: eslint .
         run: npm exec -- eslint -f ./actions/eslint-formatter-gh-actions .
+
+  prettier:
+    name: prettier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v3
+      - name: Setup Github Actions for Node.js
+        uses: actions/setup-node@v3
+      - run: npm clean-install --workspaces --include-workspace-root
+      - name: prettier --check .
+        uses: thnetii/.github/actions/gh-actions-prettier@prettier
