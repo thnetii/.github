@@ -71,4 +71,4 @@ jobs:
         uses: actions/setup-node@v3
       - run: npm clean-install --workspaces --include-workspace-root
       - name: prettier --check .
-        uses: thnetii/.github/actions/gh-actions-prettier@prettier
+        uses: thnetii/.github/actions/gh-actions-prettier@main
