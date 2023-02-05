@@ -1,16 +1,16 @@
 {
-  "name": "@thnetii/eslint-formatter-gh-actions",
+  "name": "@thnetii/gh-actions-eslint",
   "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thnetii/.github.git",
-    "directory": "actions/eslint-formatter-gh-actions"
+    "directory": "actions/gh-actions-eslint"
   },
   "keywords": [
     "ghactions",
     "gh-actions",
     "github-actions",
-    "eslint-formatter"
+    "eslint"
   ],
   "author": {
     "name": "TH-NETII Rasch Solutions",
@@ -27,13 +27,16 @@
   "license": "MIT",
   "files": [
     "action.yml",
+    "formatter.js",
     "setup.js"
   ],
-  "main": "formatter.js",
-  "type": "commonjs",
+  "main": "action.js",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "eslint-formatter-stylish": "^8.3.0"
+    "@actions/exec": "^1.1.1",
+    "@thnetii/gh-actions-core-helpers": "*",
+    "eslint-formatter-stylish": "^8.3.0",
+    "setup-node": "github:actions/setup-node#v3.6.0"
   },
   "devDependencies": {
     "@types/eslint": "^8.4.10"

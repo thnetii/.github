@@ -3,7 +3,7 @@ const ghaCommand = require('@actions/core/lib/command');
 /** @type {import('eslint').ESLint.Formatter['format']} */
 const stylish = require('eslint-formatter-stylish');
 
-/** @type {{[s in import('eslint').Linter.Severity]: typeof ghaCore.error}} */
+/** @type {{[s in import('eslint').Linter.Severity]: import('@actions/core')['error']}} */
 const severityCallback = {
   0: ghaCore.notice,
   1: ghaCore.warning,
@@ -26,7 +26,7 @@ module.exports = (results, data) => {
       suggestions,
     } of messages) {
       const callback = severityCallback[severity];
-      /** @type {ghaCore.AnnotationProperties} */
+      /** @type {import('@actions/core').AnnotationProperties} */
       const props = {
         file: filePath,
         title,
