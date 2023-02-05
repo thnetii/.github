@@ -1,14 +1,14 @@
 const ghaCore = require('@actions/core');
 
 module.exports = {
-  /** @type {typeof ghaCore.getInput} */
+  /** @type {import('@actions/core')['getInput']} */
   getInput(name, options) {
     const val = ghaCore.getInput(name, options);
     ghaCore.debug(`INPUT ${name}: ${val}`);
     return val;
   },
 
-  /** @type {typeof ghaCore.getMultilineInput} */
+  /** @type {import('@actions/core')['getMultilineInput']} */
   getMultilineInput(name, options) {
     const val = ghaCore.getMultilineInput(name, options);
     ghaCore.debug(`INPUT ${name}: ${JSON.stringify(val)}`);
@@ -33,7 +33,7 @@ module.exports = {
 
   getNpmExecArguments() {
     const npmExecArgs = ['exec'];
-    const { getInput, getBooleanInput, getMultilineInput } = module.exports;
+    const { getBooleanInput, getMultilineInput } = module.exports;
     if (
       getBooleanInput('npm-exec-allow-package-install', { required: false })
     ) {
@@ -45,9 +45,11 @@ module.exports = {
     for (const execPkg of execPackages) {
       npmExecArgs.push(`--package=${execPkg}`);
     }
-    const npmWorkspace = getInput('npm-workspace', { required: false });
-    if (npmWorkspace) {
-      npmExecArgs.push('--workspace', npmWorkspace);
+    const npmWorkspace = getMultilineInput('npm-workspace', {
+      required: false,
+    });
+    if (npmWorkspace?.length) {
+      npmExecArgs.push(...npmWorkspace.flatMap((w) => ['--workspace', w]));
     } else if (getBooleanInput('npm-workspaces', { required: false })) {
       npmExecArgs.push('--workspaces');
       if (getBooleanInput('npm-include-workspace-root', { required: false })) {
