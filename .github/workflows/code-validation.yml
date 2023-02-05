@@ -54,12 +54,8 @@ jobs:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
       - run: npm clean-install --workspaces --include-workspace-root
-      # - name: npm install --no-save @thnetii/eslint-formatter-gh-actions
-      #   run: npm install --no-save https://gitpkg.now.sh/thnetii/gh-actions/src/eslint-formatter-gh-actions?main
-      # - name: npm clean-install --workspace @thnetii/eslint-config-node-base --omit=dev
-      #   run: npm clean-install --workspace .submodules/GitHub/thnetii/eslint-config/src/eslint-config-node-base --omit=dev
       - name: eslint .
-        run: npm exec -- eslint -f ./actions/eslint-formatter-gh-actions .
+        uses: thnetii/.github/actions/gh-actions-eslint@eslint
 
   prettier:
     name: Prettier
