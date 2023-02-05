@@ -1,0 +1,104 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "ESLint",
+      "command": [
+        "node",
+        "node_modules/eslint/bin/eslint.js",
+        "--format=compact",
+        "."
+      ],
+      "detail": "eslint --format=compact .",
+      "problemMatcher": ["$eslint-compact"],
+      "presentation": {
+        "echo": true,
+        "panel": "dedicated",
+        "revealProblems": "onProblem",
+        "showReuseMessage": true,
+        "clear": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "ESLint with fixers",
+      "command": [
+        "node",
+        "node_modules/eslint/bin/eslint.js",
+        "--format=compact",
+        "--fix",
+        "."
+      ],
+      "detail": "eslint --format=compact --fix .",
+      "problemMatcher": ["$eslint-compact"],
+      "presentation": {
+        "echo": true,
+        "panel": "dedicated",
+        "revealProblems": "onProblem",
+        "showReuseMessage": true,
+        "clear": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "TypeScript type checker",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "./jsconfig.json"
+      ],
+      "detail": "tsc --noEmit -p ./jsconfig",
+      "problemMatcher": ["$tsc"],
+      "presentation": {
+        "echo": true,
+        "panel": "dedicated",
+        "revealProblems": "onProblem",
+        "showReuseMessage": true,
+        "clear": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "Prettier check",
+      "command": [
+        "node",
+        "node_modules/prettier/bin-prettier.js",
+        "--check",
+        "."
+      ],
+      "detail": "prettier --check .",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "Prettier write changes",
+      "command": [
+        "node",
+        "node_modules/prettier/bin-prettier.js",
+        "--write",
+        "."
+      ],
+      "detail": "prettier --write .",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": true,
+        "clear": true
+      }
+    }
+  ]
+}
