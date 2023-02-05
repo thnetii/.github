@@ -55,7 +55,7 @@ jobs:
         uses: actions/setup-node@v3
       - run: npm clean-install --workspaces --include-workspace-root
       - name: eslint .
-        uses: thnetii/.github/actions/gh-actions-eslint@eslint
+        uses: thnetii/.github/actions/gh-actions-eslint@main
 
   prettier:
     name: Prettier
