@@ -46,4 +46,5 @@ getExecOutput('npm', npmExecArgs, {
     ghaCore.notice(`Prettier: ${title}`, { title });
   }
   ghaCore.setOutput('prettier-exitcode', exitCode);
+  process.exitCode = exitCode;
 });

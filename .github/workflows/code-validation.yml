@@ -62,7 +62,7 @@ jobs:
         run: npm exec -- eslint -f ./actions/eslint-formatter-gh-actions .
 
   prettier:
-    name: prettier
+    name: Prettier
     runs-on: ubuntu-latest
     steps:
       - name: Checkout ${{ github.repository }}@${{ github.ref }}
