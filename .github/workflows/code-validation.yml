@@ -52,7 +52,7 @@ jobs:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
       - run: npm clean-install --workspaces --include-workspace-root
-      - name: npm install --no-save @thnetii/eslint-formatter-gh-actions
-        run: npm install --no-save https://gitpkg.now.sh/thnetii/gh-actions/src/eslint-formatter-gh-actions?main
+      # - name: npm install --no-save @thnetii/eslint-formatter-gh-actions
+      #   run: npm install --no-save https://gitpkg.now.sh/thnetii/gh-actions/src/eslint-formatter-gh-actions?main
       - name: eslint .
-        run: npm exec -- eslint -f @thnetii/eslint-formatter-gh-actions .
+        run: npm exec -- eslint -f ./actions/eslint-formatter-gh-actions .
