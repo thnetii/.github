@@ -19,7 +19,7 @@ jobs:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
       - name: npm clean-install --workspaces --include-workspace-root
-        uses: thnetii/gh-actions/src/gh-actions-npm@main
+        uses: thnetii/.github/actions/gh-actions-npm@main
         with:
           arguments: |
             clean-install
@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-node@v3
       - run: npm clean-install --workspaces --include-workspace-root
       - name: tsc --noEmit -p ./jsconfig.json
-        uses: thnetii/gh-actions/src/gh-actions-tsc@main
+        uses: thnetii/.github/actions/gh-actions-tsc@main
         with:
           arguments: |
             --noEmit
