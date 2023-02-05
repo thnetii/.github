@@ -1,0 +1,36 @@
+name: '@thnetii/gh-actions-eslint'
+author: thnetii
+description: ''
+inputs:
+  arguments:
+    required: true
+    description: ''
+    default: '.'
+  working-directory:
+    default: ${{ github.workspace }}
+    description: ''
+    required: false
+  npm-exec-packages:
+    description: ''
+    required: false
+  npm-exec-allow-package-install:
+    description: ''
+    required: false
+  npm-workspace:
+    description: ''
+    required: false
+  npm-workspaces:
+    description: ''
+    default: 'false'
+    required: false
+  npm-include-workspace-root:
+    description: ''
+    default: 'false'
+    required: false
+outputs:
+  eslint-exitcode:
+    description: ''
+runs:
+  using: node16
+  pre: setup.js
+  main: action.js
