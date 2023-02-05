@@ -1,6 +1,22 @@
 version: 2
 updates:
+  - package-ecosystem: github-actions
+    directory: /
+    open-pull-requests-limit: 50
+    schedule:
+      interval: daily
+    reviewers:
+      - thnetii/organization
+
   - package-ecosystem: npm
+    directory: /
+    open-pull-requests-limit: 50
+    schedule:
+      interval: daily
+    reviewers:
+      - thnetii/organization
+
+  - package-ecosystem: gitsubmodule
     directory: /
     open-pull-requests-limit: 50
     schedule:
