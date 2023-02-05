@@ -42,7 +42,7 @@ getExecOutput('npm', npmExecArgs, {
     ghaCore.error(`Prettier: ${title}`, { title });
   }
   if (exitCode === 2) {
-    const title = "Something\'s wrong with Prettier";
+    const title = "Something's wrong with Prettier";
     ghaCore.notice(`Prettier: ${title}`, { title });
   }
   ghaCore.setOutput('prettier-exitcode', exitCode);
