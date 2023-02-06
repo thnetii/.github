@@ -1,0 +1,20 @@
+name: '@thnetii/gh-actions-exec'
+author: thnetii
+description: ''
+inputs:
+  command:
+    required: true
+    description: ''
+  arguments:
+    description: ''
+  working-directory:
+    default: ${{ github.workspace }}
+    description: ''
+    required: false
+outputs:
+  command-exitcode:
+    description: ''
+runs:
+  using: node16
+  pre: setup.js
+  main: action.js
