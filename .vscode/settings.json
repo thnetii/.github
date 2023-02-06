@@ -1,5 +1,8 @@
 {
   "eslint.enable": true,
   "eslint.lintTask.enable": true,
-  "eslint.lintTask.options": "."
+  "eslint.lintTask.options": ".",
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": ".github/workflows/*.yml"
+  }
 }
