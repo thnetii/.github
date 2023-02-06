@@ -72,8 +72,15 @@ jobs:
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
-      - run: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
-        working-directory: ${{ inputs.npm-working-directory }}
+      - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+        uses: thnetii/.github/actions/gh-actions-exec@main
+        with:
+          command: npm
+          arguments: |
+            ${{ inputs.npm-install-command }}
+            ${{ join(fromJSON(inputs.npm-install-arguments), '
+            ') }}
+          working-directory: ${{ inputs.npm-install-working-directory }}
       - name: tsc ${{ fromJSON(inputs.tsc-parameters).arguments }}
         uses: thnetii/.github/actions/gh-actions-tsc@main
         with: ${{ fromJSON(inputs.tsc-parameters) }}
@@ -88,8 +95,15 @@ jobs:
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
-      - run: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
-        working-directory: ${{ inputs.npm-working-directory }}
+      - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+        uses: thnetii/.github/actions/gh-actions-exec@main
+        with:
+          command: npm
+          arguments: |
+            ${{ inputs.npm-install-command }}
+            ${{ join(fromJSON(inputs.npm-install-arguments), '
+            ') }}
+          working-directory: ${{ inputs.npm-install-working-directory }}
       - name: eslint ${{ fromJSON(inputs.eslint-parameters).arguments || '.' }}
         uses: thnetii/.github/actions/gh-actions-eslint@main
         with: ${{ fromJSON(inputs.eslint-parameters) }}
@@ -104,8 +118,15 @@ jobs:
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
-      - run: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
-        working-directory: ${{ inputs.npm-working-directory }}
+      - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+        uses: thnetii/.github/actions/gh-actions-exec@main
+        with:
+          command: npm
+          arguments: |
+            ${{ inputs.npm-install-command }}
+            ${{ join(fromJSON(inputs.npm-install-arguments), '
+            ') }}
+          working-directory: ${{ inputs.npm-install-working-directory }}
       - name: prettier --check ${{ fromJSON(inputs.prettier-parameters).arguments || '.' }}
         uses: thnetii/.github/actions/gh-actions-prettier@main
         with: ${{ fromJSON(inputs.prettier-parameters) }}
