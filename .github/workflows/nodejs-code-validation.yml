@@ -1,0 +1,111 @@
+name: Node.js Code Validation
+
+on:
+  workflow_call:
+    inputs:
+      checkout-parameters:
+        type: string
+        default: '{}'
+        description: ''
+      npm-working-directory:
+        type: string
+        required: false
+        description: ''
+      npm-install-check-enable:
+        type: boolean
+        default: true
+        description: ''
+      npm-install-command:
+        type: string
+        default: 'clean-install'
+      npm-install-arguments:
+        type: string
+        default: '[]'
+      tsc-check-enable:
+        type: boolean
+        default: false
+      tsc-parameters:
+        type: string
+        default: '{"arguments": "--noEmit"}'
+      eslint-check-enable:
+        type: boolean
+        default: true
+        description: ''
+      eslint-parameters:
+        type: string
+        default: '{}'
+      prettier-check-enable:
+        type: boolean
+        default: true
+        description: ''
+      prettier-parameters:
+        type: string
+        default: '{}'
+
+jobs:
+  npm:
+    name: Npm Packages
+    if: inputs.npm-install-check-enable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v3
+        with: ${{ fromJSON(inputs.checkout-parameters) }}
+      - name: Setup Github Actions for Node.js
+        uses: actions/setup-node@v3
+      - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+        uses: thnetii/.github/actions/gh-actions-npm@main
+        with:
+          working-directory: ${{ inputs.npm-working-directory }}
+          arguments: |
+            ${{ inputs.npm-install-command }}
+            ${{ join(fromJSON(inputs.npm-install-arguments), '
+            ') }}
+
+  tsc:
+    name: TypeScript type check
+    if: inputs.tsc-check-enable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v3
+        with: ${{ fromJSON(inputs.checkout-parameters) }}
+      - name: Setup Github Actions for Node.js
+        uses: actions/setup-node@v3
+      - run: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+        working-directory: ${{ inputs.npm-working-directory }}
+      - name: tsc ${{ fromJSON(inputs.tsc-parameters).arguments }}
+        uses: thnetii/.github/actions/gh-actions-tsc@main
+        with: ${{ fromJSON(inputs.tsc-parameters) }}
+
+  eslint:
+    name: ESLint
+    if: inputs.eslint-check-enable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v3
+        with: ${{ fromJSON(inputs.checkout-parameters) }}
+      - name: Setup Github Actions for Node.js
+        uses: actions/setup-node@v3
+      - run: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+        working-directory: ${{ inputs.npm-working-directory }}
+      - name: eslint ${{ fromJSON(inputs.eslint-parameters).arguments || '.' }}
+        uses: thnetii/.github/actions/gh-actions-eslint@main
+        with: ${{ fromJSON(inputs.eslint-parameters) }}
+
+  prettier:
+    name: Prettier
+    if: inputs.prettier-check-enable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout ${{ github.repository }}@${{ github.ref }}
+        uses: actions/checkout@v3
+        with: ${{ fromJSON(inputs.checkout-parameters) }}
+      - name: Setup Github Actions for Node.js
+        uses: actions/setup-node@v3
+      - run: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+        working-directory: ${{ inputs.npm-working-directory }}
+      - name: prettier --check ${{ fromJSON(inputs.prettier-parameters).arguments || '.' }}
+        uses: thnetii/.github/actions/gh-actions-prettier@main
+        with: ${{ fromJSON(inputs.prettier-parameters) }}
