@@ -85,7 +85,7 @@ jobs:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
         with: ${{ fromJSON(inputs.setup-node-parameters) }}
-      - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+      - name: Run npm install command
         uses: thnetii/.github/actions/gh-actions-npm@main
         with:
           working-directory: ${{ inputs.npm-install-working-directory }}
@@ -105,7 +105,7 @@ jobs:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
         with: ${{ fromJSON(inputs.setup-node-parameters) }}
-      - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+      - name: Run npm install command
         uses: thnetii/.github/actions/gh-actions-exec@main
         with:
           command: npm
@@ -114,7 +114,7 @@ jobs:
             ${{ join(fromJSON(inputs.npm-install-arguments), '
             ') }}
           working-directory: ${{ inputs.npm-install-working-directory }}
-      - name: tsc ${{ fromJSON(inputs.tsc-parameters).arguments }}
+      - name: Run TypeScript compiler command
         uses: thnetii/.github/actions/gh-actions-tsc@main
         with: ${{ fromJSON(inputs.tsc-parameters) }}
 
@@ -129,7 +129,7 @@ jobs:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
         with: ${{ fromJSON(inputs.setup-node-parameters) }}
-      - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+      - name: Run npm install command
         uses: thnetii/.github/actions/gh-actions-exec@main
         with:
           command: npm
@@ -138,7 +138,7 @@ jobs:
             ${{ join(fromJSON(inputs.npm-install-arguments), '
             ') }}
           working-directory: ${{ inputs.npm-install-working-directory }}
-      - name: eslint ${{ fromJSON(inputs.eslint-parameters).arguments || '.' }}
+      - name: Run ESLint command
         uses: thnetii/.github/actions/gh-actions-eslint@main
         with: ${{ fromJSON(inputs.eslint-parameters) }}
 
@@ -153,7 +153,7 @@ jobs:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
         with: ${{ fromJSON(inputs.setup-node-parameters) }}
-      - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
+      - name: Run npm install command
         uses: thnetii/.github/actions/gh-actions-exec@main
         with:
           command: npm
@@ -162,6 +162,6 @@ jobs:
             ${{ join(fromJSON(inputs.npm-install-arguments), '
             ') }}
           working-directory: ${{ inputs.npm-install-working-directory }}
-      - name: prettier --check ${{ fromJSON(inputs.prettier-parameters).arguments || '.' }}
+      - name: Run Prettier check command
         uses: thnetii/.github/actions/gh-actions-prettier@main
         with: ${{ fromJSON(inputs.prettier-parameters) }}
