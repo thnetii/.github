@@ -1,46 +1,77 @@
 name: Node.js Code Validation
 
 on:
-  workflow_call:
+  workflow_call: # Reusable workflow
     inputs:
       checkout-parameters:
         type: string
         default: '{}'
-        description: ''
-      npm-working-directory:
+        description: >
+          A JSON object string specifying the inputs for the actions/checkout
+          GitHub action.
+      setup-node-parameters:
+        type: string
+        default: '{}'
+        description: >
+          A JSON object string specifying the inputs for the actions/setup-node
+          GitHub action.
+      npm-install-working-directory:
         type: string
         required: false
-        description: ''
+        description: |
+          Optional. The working directory from which the npm command to install
+          packages for the checked out code is run from.
       npm-install-check-enable:
         type: boolean
         default: true
-        description: ''
+        description: |
+          Whether the output of the npm install command should be checked for
+          warning and error messages.
+          If true, warnings and errors will be reported to GitHub actions.
       npm-install-command:
         type: string
         default: 'clean-install'
+        description: |
+          The npm command to run in order to install package dependencies.
       npm-install-arguments:
         type: string
         default: '[]'
+        description: |
+          Optional. Additional argument passed to the npm install command during
+          package installation.
       tsc-check-enable:
         type: boolean
         default: false
+        description: |
+          Whether the TypeScript type checker job should be executed.
       tsc-parameters:
         type: string
         default: '{"arguments": "--noEmit"}'
+        description: >
+          A JSON object string specifying the inputs for the
+          thnetii/.github/actions/gh-actions-tsc GitHub action.
       eslint-check-enable:
         type: boolean
         default: true
-        description: ''
+        description: |
+          Whether the ESLint checker job should be executed.
       eslint-parameters:
         type: string
         default: '{}'
+        description: >
+          A JSON object string specifying the inputs for the
+          thnetii/.github/actions/gh-actions-eslint GitHub action.
       prettier-check-enable:
         type: boolean
         default: true
-        description: ''
+        description: |
+          Whether the Prettier checker job should be executed.
       prettier-parameters:
         type: string
         default: '{}'
+        description: >
+          A JSON object string specifying the inputs for the
+          thnetii/.github/actions/gh-actions-prettier GitHub action.
 
 jobs:
   npm:
@@ -53,10 +84,11 @@ jobs:
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
+        with: ${{ inputs.setup-node-parameters }}
       - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
         uses: thnetii/.github/actions/gh-actions-npm@main
         with:
-          working-directory: ${{ inputs.npm-working-directory }}
+          working-directory: ${{ inputs.npm-install-working-directory }}
           arguments: |
             ${{ inputs.npm-install-command }}
             ${{ join(fromJSON(inputs.npm-install-arguments), '
@@ -72,6 +104,7 @@ jobs:
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
+        with: ${{ inputs.setup-node-parameters }}
       - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
         uses: thnetii/.github/actions/gh-actions-exec@main
         with:
@@ -95,6 +128,7 @@ jobs:
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
+        with: ${{ inputs.setup-node-parameters }}
       - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
         uses: thnetii/.github/actions/gh-actions-exec@main
         with:
@@ -118,6 +152,7 @@ jobs:
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
+        with: ${{ inputs.setup-node-parameters }}
       - name: npm ${{ inputs.npm-install-command }} ${{ join(fromJSON(inputs.npm-install-arguments), ' ') }}
         uses: thnetii/.github/actions/gh-actions-exec@main
         with:

@@ -11,6 +11,7 @@ on:
 
 jobs:
   nodejs:
+    name: Node.js
     uses: thnetii/.github/.github/workflows/nodejs-code-validation.yml@main
     with:
       checkout-parameters: >
