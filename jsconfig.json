@@ -6,6 +6,7 @@
   "compilerOptions": {
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "exactOptionalPropertyTypes": false
+    "exactOptionalPropertyTypes": false,
+    "ignoreDeprecations": "5.0"
   }
 }
