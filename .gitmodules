@@ -1,3 +1,4 @@
 [submodule "GitHub/thnetii/eslint-config"]
 	path = .submodules/GitHub/thnetii/eslint-config
 	url = https://github.com/thnetii/eslint-config.git
+	branch = main
