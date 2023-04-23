@@ -16,6 +16,7 @@
   "homepage": "https://github.com/thnetii/.github#readme",
   "license": "MIT",
   "workspaces": [
+    ".submodules/GitHub/thnetii/eslint-config/src/eslint-config-node-base",
     "actions/*"
   ],
   "scripts": {
@@ -26,7 +27,7 @@
     "prettier:check": "prettier --check ."
   },
   "devDependencies": {
-    "@thnetii/eslint-config-node-base": "file:.submodules/GitHub/thnetii/eslint-config/src/eslint-config-node-base",
+    "@thnetii/eslint-config-node-base": "*",
     "@tsconfig/node16": "^1",
     "@tsconfig/strictest": "^2",
     "eslint": "^8.38.0",
