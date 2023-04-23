@@ -22,6 +22,13 @@ const msalClientAssertion = getInput('assertion', {
   required: true,
   trimWhitespace: true,
 });
+if (ghaCore.isDebug()) {
+  const [, ghaTokenBody = '{}'] = msalClientAssertion.split('.', 3);
+  const ghaTokenPayload = JSON.parse(ghaTokenBody);
+  ghaCore.debug(
+    `Client Assertion: ${JSON.stringify(ghaTokenPayload, undefined, 2)}`
+  );
+}
 const msalInstance =
   /** @type {AzureCloudInstance} */ (
     getInput('instance', { required: false, trimWhitespace: true })
