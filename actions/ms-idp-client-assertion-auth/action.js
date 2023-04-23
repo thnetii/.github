@@ -18,32 +18,24 @@ const msalTenantId = getInput('tenant-id', {
   required: true,
   trimWhitespace: true,
 });
-const msalClientAssertion = getInput('assertion', {
-  required: true,
-  trimWhitespace: true,
-});
-if (ghaCore.isDebug()) {
-  const [, ghaTokenBody = '{}'] = msalClientAssertion.split('.', 3);
-  const ghaTokenPayload = JSON.parse(ghaTokenBody);
-  ghaCore.debug(
-    `Client Assertion: ${JSON.stringify(ghaTokenPayload, undefined, 2)}`
-  );
-}
 const msalInstance =
   /** @type {AzureCloudInstance} */ (
     getInput('instance', { required: false, trimWhitespace: true })
   ) || AzureCloudInstance.AzurePublic;
-const msalAudience =
-  getInput('audience', {
+const msalResource =
+  getInput('resource', {
     required: false,
     trimWhitespace: true,
   }) || msalClientId;
+const ghaAudience = getInput('audience', {
+  required: true,
+  trimWhitespace: true,
+});
 
 /** @type {Parameters<import('@azure/msal-node')['buildAppConfiguration']>[0]} */
 const msalConfiguration = {
   auth: {
     clientId: msalClientId,
-    clientAssertion: msalClientAssertion,
     azureCloudOptions: {
       azureCloudInstance: msalInstance,
       tenant: msalTenantId,
@@ -67,13 +59,23 @@ const msalConfiguration = {
 const msalAppConfiguration = buildAppConfiguration(msalConfiguration);
 const msalConfApp = new ConfidentialClientApplication(msalAppConfiguration);
 
-/** @type {import('@azure/msal-node').ClientCredentialRequest} */
-const msalTokenReq = {
-  scopes: [`${msalAudience}/.default`],
-};
-
 (async () => {
-  const result = await msalConfApp.acquireTokenByClientCredential(msalTokenReq);
+  const ghaIdToken = await ghaCore.getIDToken(ghaAudience);
+  if (ghaCore.isDebug()) {
+    const [, ghaIdTokenBodyBase64 = '{}'] = ghaIdToken.split('.', 3);
+    const ghaIdTokenBodyBuffer = Buffer.from(ghaIdTokenBodyBase64, 'base64url');
+    ghaCore.debug(
+      `Client Assertion: ${JSON.stringify(
+        ghaIdTokenBodyBuffer.toString('utf-8'),
+        undefined,
+        2
+      )}`
+    );
+  }
+  const result = await msalConfApp.acquireTokenByClientCredential({
+    scopes: [`${msalResource}/.default`],
+    clientAssertion: ghaIdToken,
+  });
   if (result === null) {
     ghaCore.setFailed('MSAL authentication result is null');
     return;

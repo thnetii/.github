@@ -17,13 +17,12 @@ inputs:
       The Microsoft Identity platform instance to use for authentication.
       Default: The public Azure AD authentication endpoint.
     default: 'https://login.microsoftonline.com'
-  assertion:
-    description: >
-      An assertion (a JWT, or JSON web token) that your application gets from
-      another identity provider outside of Microsoft identity platform.
-      Default: The Github Actions Access Token for the current workflow run.
-    default: ${{ github.token }}
   audience:
+    description: >
+      This value is used to establish a connection between your GitHub Actions
+      workflow and Azure Active Directory.
+    default: 'api://AzureADTokenExchange'
+  resource:
     description: >
       The requested audience of the access token after authentication completes.
       This should be the resource identifier or Application ID URI of the
