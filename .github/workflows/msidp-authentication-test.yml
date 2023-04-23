@@ -9,28 +9,22 @@ on:
       client-id:
         type: string
         required: true
+      resource:
+        type: string
 
 permissions:
   id-token: write
 
 jobs:
   msal:
-    name: MSAL Authentication
+    name: Acquire Azure AD Access Token
     runs-on: ubuntu-latest
     steps:
-      - name: Make client_dispatch inputs as secrets
-        uses: actions/github-script@v6
-        with:
-          script: >
-            core.setSecret(process.env['ACTIONS_SCRIPT_TENANT_ID']);
-            core.setSecret(process.env['ACTIONS_SCRIPT_CLIENT_ID']);
-        env:
-          ACTIONS_SCRIPT_TENANT_ID: ${{ inputs.tenant-id }}
-          ACTIONS_SCRIPT_CLIENT_ID: ${{ inputs.client-id }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
       - name: Authenticate using GitHub action
-        uses: thnetii/.github/actions/ms-idp-client-assertion-auth@main
+        uses: thnetii/.github/actions/ms-idp-workflow-run-auth@main
         with:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
+          resource: ${{ inputs.resource }}

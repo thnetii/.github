@@ -1,10 +1,10 @@
 {
-  "name": "@thnetii/gh-actions-ms-idp-client-assertion-auth",
+  "name": "@thnetii/gh-actions-ms-idp-workflow-run-auth",
   "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/thnetii/.github.git",
-    "directory": "actions/ms-idp-client-assertion-auth"
+    "directory": "actions/ms-idp-workflow-run-auth"
   },
   "author": {
     "name": "TH-NETII Rasch Solutions",

@@ -3,12 +3,12 @@ const {
   buildAppConfiguration,
   ConfidentialClientApplication,
   AzureCloudInstance,
-  LogLevel,
 } = require('@azure/msal-node');
 
 const { getInput } = require('@thnetii/gh-actions-core-helpers');
 
 const { GhaMsalNetworkModule } = require('./GhaMsalNetworkModule');
+const { loggerOptions } = require('./GhaMsalLogging');
 
 const msalClientId = getInput('client-id', {
   required: true,
@@ -27,10 +27,6 @@ const msalResource =
     required: false,
     trimWhitespace: true,
   }) || msalClientId;
-const ghaAudience = getInput('audience', {
-  required: true,
-  trimWhitespace: true,
-});
 
 /** @type {Parameters<import('@azure/msal-node')['buildAppConfiguration']>[0]} */
 const msalConfiguration = {
@@ -43,20 +39,18 @@ const msalConfiguration = {
   },
   system: {
     networkClient: new GhaMsalNetworkModule(),
-    loggerOptions: {
-      loggerCallback(level, message) {
-        if (level === LogLevel.Error) ghaCore.error(message);
-        else if (level === LogLevel.Warning) ghaCore.warning(message);
-        else if (level === LogLevel.Info) ghaCore.info(message);
-        else ghaCore.debug(message);
-      },
-      logLevel: ghaCore.isDebug() ? LogLevel.Verbose : LogLevel.Info,
-      piiLoggingEnabled: false,
-    },
+    loggerOptions,
   },
 };
 
-(async () => {
+const getGithubActionsToken = async () => {
+  const ghaAudience = getInput('id-token-audience', {
+    required: false,
+    trimWhitespace: true,
+  });
+  ghaCore.debug(
+    `Requesting GitHub Actions ID token for audience: '${ghaAudience}'`
+  );
   const ghaIdToken = await ghaCore.getIDToken(ghaAudience);
   if (ghaCore.isDebug()) {
     const [, ghaIdTokenBodyBase64 = '{}'] = ghaIdToken.split('.', 3);
@@ -69,6 +63,11 @@ const msalConfiguration = {
       )}`
     );
   }
+  return ghaIdToken;
+};
+
+/** @param {string} ghaIdToken */
+const acquireMsalToken = async (ghaIdToken) => {
   msalConfiguration.auth.clientAssertion = ghaIdToken;
   const msalAppConfiguration = buildAppConfiguration(msalConfiguration);
   const msalConfApp = new ConfidentialClientApplication(msalAppConfiguration);
@@ -83,4 +82,11 @@ const msalConfiguration = {
   ghaCore.setOutput('result', result);
   if (ghaCore.isDebug()) ghaCore.debug(JSON.stringify(result, undefined, 2));
   ghaCore.setOutput('access-token', result.accessToken);
-})();
+};
+
+const run = async () => {
+  const ghaIdToken = await getGithubActionsToken();
+  acquireMsalToken(ghaIdToken);
+};
+
+run();
