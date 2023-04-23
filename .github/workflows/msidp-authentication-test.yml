@@ -1,7 +1,14 @@
 name: MSAL Federated Credentials
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      tenant-id:
+        type: string
+        required: true
+      client-id:
+        type: string
+        required: true
 
 permissions:
   id-token: write
@@ -11,10 +18,19 @@ jobs:
     name: MSAL Authentication
     runs-on: ubuntu-latest
     steps:
+      - name: Make client_dispatch inputs as secrets
+        uses: actions/github-script@v6
+        with:
+          script: >
+            core.setSecret(process.env['ACTIONS_SCRIPT_TENANT_ID']);
+            core.setSecret(process.env['ACTIONS_SCRIPT_CLIENT_ID']);
+        env:
+          ACTIONS_SCRIPT_TENANT_ID: ${{ inputs.tenant-id }}
+          ACTIONS_SCRIPT_CLIENT_ID: ${{ inputs.client-id }}
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
       - name: Authenticate using GitHub action
         uses: thnetii/.github/actions/ms-idp-client-assertion-auth@main
         with:
-          tenant-id: ${{ secrets.MSIDP_TENANT_ID }}
-          client-id: ${{ secrets.MSIDP_CLIENT_ID }}
+          tenant-id: ${{ inputs.tenant-id }}
+          client-id: ${{ inputs.client-id }}
