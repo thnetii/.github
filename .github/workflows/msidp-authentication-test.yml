@@ -3,6 +3,9 @@ name: MSAL Federated Credentials
 on:
   workflow_dispatch: {}
 
+permissions:
+  id-token: write
+
 jobs:
   msal:
     name: MSAL Authentication
