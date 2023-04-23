@@ -3,6 +3,7 @@ const {
   buildAppConfiguration,
   ConfidentialClientApplication,
   AzureCloudInstance,
+  AuthError,
 } = require('@azure/msal-node');
 
 const { getInput } = require('@thnetii/gh-actions-core-helpers');
@@ -71,9 +72,19 @@ const acquireMsalToken = async (ghaIdToken) => {
   msalConfiguration.auth.clientAssertion = ghaIdToken;
   const msalAppConfiguration = buildAppConfiguration(msalConfiguration);
   const msalConfApp = new ConfidentialClientApplication(msalAppConfiguration);
-  const result = await msalConfApp.acquireTokenByClientCredential({
-    scopes: [`${msalResource}/.default`],
-  });
+  let result;
+  try {
+    result = await msalConfApp.acquireTokenByClientCredential({
+      scopes: [`${msalResource}/.default`],
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      ghaCore.error(error.message, { title: error.errorMessage });
+    } else {
+      ghaCore.error(error instanceof Error ? error : `${error}`);
+    }
+    throw error;
+  }
   if (result === null) {
     ghaCore.setFailed('MSAL authentication result is null');
     return;
