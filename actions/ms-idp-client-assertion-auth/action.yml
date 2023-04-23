@@ -1,0 +1,48 @@
+name: '@thnetii/gh-actions-ms-idp-client-assertion-auth'
+author: thnetii
+description: ''
+inputs:
+  tenant-id:
+    description: >
+      Azure AD Tenant Id (aka. Directory ID)
+      or
+      One of the registered friendly domain names of the tenant
+    required: true
+  client-id:
+    description: >
+      Client ID (aka. Application ID) of the application to authenticate.
+    required: true
+  instance:
+    description: >
+      The Microsoft Identity platform instance to use for authentication.
+      Default: The public Azure AD authentication endpoint.
+    default: 'https://login.microsoftonline.com'
+  assertion:
+    description: >
+      An assertion (a JWT, or JSON web token) that your application gets from
+      another identity provider outside of Microsoft identity platform.
+      Default: The Github Actions Access Token for the current workflow run.
+    default: ${{ github.token }}
+  audience:
+    description: >
+      The requested audience of the access token after authentication completes.
+      This should be the resource identifier or Application ID URI of the
+      resource to which access is granted.
+      Example: For Microsoft Graph the value is: https://graph.microsoft.com
+      If omitted or empty, the audience will be set to the client id.
+outputs:
+  access-token:
+    description: >
+      The requested access token. The app can use this token to authenticate to
+      the secured resource, such as to a web API.
+  result:
+    description: >
+      A JSON serialized object representing the details of the authentication.
+      It contains a property 'accessToken' which is equal to the 'access-token'
+      output value.
+      The object is an instance of the `AuthenticationResult` described by the
+      `@azure/msal-common` npm package.
+runs:
+  using: node16
+  pre: setup.js
+  main: action.js
