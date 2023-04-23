@@ -56,9 +56,6 @@ const msalConfiguration = {
   },
 };
 
-const msalAppConfiguration = buildAppConfiguration(msalConfiguration);
-const msalConfApp = new ConfidentialClientApplication(msalAppConfiguration);
-
 (async () => {
   const ghaIdToken = await ghaCore.getIDToken(ghaAudience);
   if (ghaCore.isDebug()) {
@@ -72,9 +69,11 @@ const msalConfApp = new ConfidentialClientApplication(msalAppConfiguration);
       )}`
     );
   }
+  msalConfiguration.auth.clientAssertion = ghaIdToken;
+  const msalAppConfiguration = buildAppConfiguration(msalConfiguration);
+  const msalConfApp = new ConfidentialClientApplication(msalAppConfiguration);
   const result = await msalConfApp.acquireTokenByClientCredential({
     scopes: [`${msalResource}/.default`],
-    clientAssertion: ghaIdToken,
   });
   if (result === null) {
     ghaCore.setFailed('MSAL authentication result is null');
