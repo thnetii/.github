@@ -35,7 +35,7 @@
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
     "@thnetii/gh-actions-core-helpers": "*",
-    "eslint-formatter-stylish": "^8.3.0",
+    "eslint-formatter-stylish": "^8.39.0",
     "setup-node": "github:actions/setup-node#v3.6.0"
   },
   "devDependencies": {
