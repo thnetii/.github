@@ -4,10 +4,7 @@ const {
   HttpClientError,
   HttpCodes,
 } = require('@actions/http-client');
-const {
-  BasicCredentialHandler,
-  BearerCredentialHandler,
-} = require('@actions/http-client/lib/auth');
+const { BearerCredentialHandler } = require('@actions/http-client/lib/auth');
 
 const { getInput } = require('@thnetii/gh-actions-core-helpers');
 
@@ -98,13 +95,25 @@ async function getAcsMetadata(httpClient, instance, tenantId) {
 /**
  * @param {HttpClient} httpClient
  * @param {string} tokenEndpoint
+ * @param {string} realm
+ * @param {string} clientId
+ * @param {string} clientSecret
  * @param {string} resource
  */
-async function getAcsAccessToken(httpClient, tokenEndpoint, resource) {
+async function getAcsAccessToken(
+  httpClient,
+  tokenEndpoint,
+  realm,
+  clientId,
+  clientSecret,
+  resource
+) {
   ghaCore.debug(
     `Requesting access token for resource '${resource}' from token endpoint: ${tokenEndpoint}`
   );
   let requestBody = 'grant_type=client_credentials';
+  requestBody += `&client_id=${encodeURIComponent(`${clientId}@${realm}`)}`;
+  requestBody += `&client_secret=${encodeURIComponent(clientSecret)}`;
   requestBody += `&resource=${encodeURIComponent(resource)}`;
   const tokenResponse = await httpClient.post(tokenEndpoint, requestBody, {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -183,19 +192,15 @@ async function main() {
       `https://accounts.accesscontrol.windows.net/${tenantId}/tokens/OAuth/2`;
     const { secretText: clientSecret } =
       await createServicePrincipalClientSecret(graphClient, clientId);
-    const acsClient = new HttpClient(undefined, [
-      new BasicCredentialHandler(`${clientId}@${tenantId}`, clientSecret),
-    ]);
-    try {
-      const { access_token: accessToken } = await getAcsAccessToken(
-        acsClient,
-        acsTokenEndpoint,
-        acsResource
-      );
-      ghaCore.setOutput('acs-access-token', accessToken);
-    } finally {
-      acsClient.dispose();
-    }
+    const { access_token: accessToken } = await getAcsAccessToken(
+      httpClient,
+      acsTokenEndpoint,
+      tenantId,
+      clientId,
+      clientSecret,
+      acsResource
+    );
+    ghaCore.setOutput('acs-access-token', accessToken);
   } finally {
     httpClient.dispose();
     graphClient.dispose();
