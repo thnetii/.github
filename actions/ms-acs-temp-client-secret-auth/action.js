@@ -112,11 +112,6 @@ async function getAcsAccessToken(httpClient, tokenEndpoint, resource) {
   const {
     message: { statusCode = 500 },
   } = tokenResponse;
-  if (statusCode !== HttpCodes.OK)
-    throw new HttpClientError(
-      'Failed to acquire OAuth 2.0 Access Token from ACS Token Endpoint',
-      statusCode
-    );
   /**
    * @type {{
    *  token_type: 'Bearer' | string;
@@ -128,6 +123,15 @@ async function getAcsAccessToken(httpClient, tokenEndpoint, resource) {
    * }}
    */
   const authResult = JSON.parse(await tokenResponse.readBody());
+  if (statusCode !== HttpCodes.OK)
+    throw new HttpClientError(
+      `Failed to acquire OAuth 2.0 Access Token from ACS Token Endpoint\n${JSON.stringify(
+        authResult,
+        undefined,
+        2
+      )}`,
+      statusCode
+    );
   const { access_token: acsAccessToken } = authResult;
   ghaCore.setSecret(acsAccessToken);
   const [, , signature] = acsAccessToken.split('.', 3);
