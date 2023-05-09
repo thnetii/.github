@@ -1,0 +1,35 @@
+{
+  "name": "@thnetii/gh-actions-ms-acs-temp-client-secret-auth",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thnetii/.github.git",
+    "directory": "actions/ms-acs-temp-client-secret-auth"
+  },
+  "author": {
+    "name": "TH-NETII Rasch Solutions",
+    "email": "fredrik.rasch@gmail.com",
+    "url": "https://thnetii.td.org.uit.no"
+  },
+  "maintainers": [
+    "Fredrik Høisæther Rasch <fredrik.rasch@gmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/thnetii/.github/issues"
+  },
+  "homepage": "https://github.com/thnetii/.github#readme",
+  "license": "MIT",
+  "files": [
+    "action.yml",
+    "*.js"
+  ],
+  "main": "action.js",
+  "engines": {
+    "node": ">= 16"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/http-client": "^2.1.0",
+    "@thnetii/gh-actions-core-helpers": "*"
+  }
+}

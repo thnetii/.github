@@ -28,3 +28,23 @@ jobs:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
           resource: ${{ inputs.resource }}
+  acs:
+    name: Acquire Azure ACS Access Token
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Github Actions for Node.js
+        uses: actions/setup-node@v3
+      - id: msgraph-auth
+        name: Authenticate using GitHub action
+        uses: thnetii/.github/actions/ms-idp-workflow-run-auth@main
+        with:
+          tenant-id: ${{ inputs.tenant-id }}
+          client-id: ${{ inputs.client-id }}
+          resource: https://graph.microsoft.com
+      - name: Authenticate using Azure Access Control Service
+        uses: thnetii/.github/actions/ms-acs-temp-client-secret-auth@main
+        with:
+          tenant-id: ${{ inputs.tenant-id }}
+          client-id: ${{ inputs.client-id }}
+          resource-id: ${{ inputs.resource }}
+          msgraph-access-token: ${{ steps.msgraph-auth.outputs.access-token }}
