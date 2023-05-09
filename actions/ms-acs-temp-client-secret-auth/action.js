@@ -1,18 +1,26 @@
 const ghaCore = require('@actions/core');
-const { HttpClient, HttpClientError } = require('@actions/http-client');
+const {
+  HttpClient,
+  HttpClientError,
+  HttpCodes,
+} = require('@actions/http-client');
+const {
+  BasicCredentialHandler,
+  BearerCredentialHandler,
+} = require('@actions/http-client/lib/auth');
 
 const { getInput } = require('@thnetii/gh-actions-core-helpers');
 
 /**
  * @param {HttpClient} httpClient
  * @param {string} clientId
- * @param {string} accessToken
  */
-async function createServicePrincipalClientSecret(
-  httpClient,
-  clientId,
-  accessToken
-) {
+async function createServicePrincipalClientSecret(httpClient, clientId) {
+  const addPasswordUrl = `https://graph.microsoft.com/v1.0/servicePrincipals(appId='${clientId}')/addPassword`;
+  ghaCore.debug(
+    'Executing Microsoft Graph REST API v1.0, servicePrincipal: addPassword'
+  );
+  ghaCore.debug(`Sending POST request to: ${addPasswordUrl}`);
   /**
    * @type {import('@actions/http-client/lib/interfaces').TypedResponse<{
    *  keyId: string;
@@ -20,15 +28,11 @@ async function createServicePrincipalClientSecret(
    * }>}
    */
   const { result: clientSecretInfo, statusCode } = await httpClient.postJson(
-    `https://graph.microsoft.com/v1.0/servicePrincipals(appId='${clientId}')/addPassword`,
+    addPasswordUrl,
     {
       passwordCredential: {
         displayName: `GitHub Actions Temporary Client Secret`,
       },
-    },
-    {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json; charset=utf-8',
     }
   );
   if (statusCode !== 200 || !clientSecretInfo)
@@ -37,8 +41,8 @@ async function createServicePrincipalClientSecret(
       statusCode
     );
   const { keyId, secretText: clientSecret } = clientSecretInfo;
-  ghaCore.saveState('client-id', clientId);
-  ghaCore.saveState('msgraph-access-token', accessToken);
+  ghaCore.debug(`Client secret created with keyId: ${keyId}`);
+  ghaCore.debug(`Registering keyId for post-job cleanup.`);
   ghaCore.saveState('client-secret-key-id', keyId);
   ghaCore.setSecret(clientSecret);
   return clientSecretInfo;
@@ -50,6 +54,12 @@ async function createServicePrincipalClientSecret(
  * @param {string} tenantId
  */
 async function getAcsMetadata(httpClient, instance, tenantId) {
+  ghaCore.debug(
+    `Requesting Azure ACS Metadata from IDP instance '${instance}' for realm '${tenantId}'`
+  );
+  const acsMetadataUrl = `${instance}/metadata/json/1?realm=${encodeURIComponent(
+    tenantId
+  )}`;
   /**
    * @type {import('@actions/http-client/lib/interfaces').TypedResponse<{
    *  keys: {
@@ -75,7 +85,7 @@ async function getAcsMetadata(httpClient, instance, tenantId) {
    * }>}
    */
   const { statusCode, result: acsMetadata } = await httpClient.getJson(
-    `${instance}/metadata/json/1?realm=${encodeURIComponent(tenantId)}`
+    acsMetadataUrl
   );
   if (statusCode !== 200 || !acsMetadata)
     throw new HttpClientError(
@@ -88,45 +98,36 @@ async function getAcsMetadata(httpClient, instance, tenantId) {
 /**
  * @param {HttpClient} httpClient
  * @param {string} tokenEndpoint
- * @param {string} tenantId
- * @param {string} clientId
- * @param {string} clientSecret
  * @param {string} resource
  */
-async function getAcsAccessToken(
-  httpClient,
-  tokenEndpoint,
-  tenantId,
-  clientId,
-  clientSecret,
-  resource
-) {
+async function getAcsAccessToken(httpClient, tokenEndpoint, resource) {
+  ghaCore.debug(
+    `Requesting access token for resource '${resource}' from token endpoint: ${tokenEndpoint}`
+  );
   let requestBody = 'grant_type=client_credentials';
-  requestBody += `&client_id=${encodeURIComponent(`${clientId}@${tenantId}`)}`;
-  requestBody += `&client_secret=${encodeURIComponent(clientSecret)}`;
   requestBody += `&resource=${encodeURIComponent(resource)}`;
+  const tokenResponse = await httpClient.post(tokenEndpoint, requestBody, {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  });
+  const {
+    message: { statusCode = 500 },
+  } = tokenResponse;
+  if (statusCode !== HttpCodes.OK)
+    throw new HttpClientError(
+      'Failed to acquire OAuth 2.0 Access Token from ACS Token Endpoint',
+      statusCode
+    );
   /**
-   * @type {import('@actions/http-client/lib/interfaces').TypedResponse<{
+   * @type {{
    *  token_type: 'Bearer' | string;
    *  access_token: string;
    *  expires_in: number;
    *  expires_on: number;
    *  not_before: number;
    *  scope?: string;
-   * }>}
+   * }}
    */
-  const { statusCode, result: authResult } = await httpClient.postJson(
-    tokenEndpoint,
-    requestBody,
-    {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    }
-  );
-  if (statusCode !== 200 || !authResult)
-    throw new HttpClientError(
-      'Failed to acquire OAuth 2.0 Access Token from ACS Token Endpoint',
-      statusCode
-    );
+  const authResult = JSON.parse(await tokenResponse.readBody());
   const { access_token: acsAccessToken } = authResult;
   ghaCore.setSecret(acsAccessToken);
   const [, , signature] = acsAccessToken.split('.', 3);
@@ -161,7 +162,13 @@ async function main() {
     ? `${acsResourceId}/${acsResourcePath}@${tenantId}`
     : `${acsResourceId}@${tenantId}`;
 
+  ghaCore.saveState('client-id', clientId);
+  ghaCore.saveState('msgraph-access-token', msgraphAccessToken);
+
   const httpClient = new HttpClient();
+  const graphClient = new HttpClient(undefined, [
+    new BearerCredentialHandler(msgraphAccessToken),
+  ]);
   try {
     const acsMetadata = await getAcsMetadata(httpClient, idpInstance, tenantId);
     const acsTokenEndpoint =
@@ -171,22 +178,23 @@ async function main() {
       )[0]?.location ||
       `https://accounts.accesscontrol.windows.net/${tenantId}/tokens/OAuth/2`;
     const { secretText: clientSecret } =
-      await createServicePrincipalClientSecret(
-        httpClient,
-        clientId,
-        msgraphAccessToken
+      await createServicePrincipalClientSecret(graphClient, clientId);
+    const acsClient = new HttpClient(undefined, [
+      new BasicCredentialHandler(`${clientId}@${tenantId}`, clientSecret),
+    ]);
+    try {
+      const { access_token: accessToken } = await getAcsAccessToken(
+        acsClient,
+        acsTokenEndpoint,
+        acsResource
       );
-    const { access_token: accessToken } = await getAcsAccessToken(
-      httpClient,
-      acsTokenEndpoint,
-      tenantId,
-      clientId,
-      clientSecret,
-      acsResource
-    );
-    ghaCore.setOutput('acs-access-token', accessToken);
+      ghaCore.setOutput('acs-access-token', accessToken);
+    } finally {
+      acsClient.dispose();
+    }
   } finally {
     httpClient.dispose();
+    graphClient.dispose();
   }
 }
 
