@@ -43,6 +43,7 @@ jobs:
           resource: https://graph.microsoft.com
       - name: Print Microsoft Graph Access Token Body
         shell: pwsh
+        if: runner.debug
         run: |
           [string[]]$TokenParts = ([string]$ENV:MSGRAPH_ACCESS_TOKEN).Split(".")
           Write-Host ".$($TokenParts[1])."
