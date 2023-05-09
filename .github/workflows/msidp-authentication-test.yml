@@ -41,6 +41,13 @@ jobs:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
           resource: https://graph.microsoft.com
+      - name: Print Microsoft Graph Access Token Body
+        shell: pwsh
+        run: |
+          [string[]]$TokenParts = ([string]$ENV:MSGRAPH_ACCESS_TOKEN).Split(".")
+          Write-Host ".$($TokenParts[1])."
+        env:
+          MSGRAPH_ACCESS_TOKEN: ${{ steps.msgraph-auth.outputs.access-token }}
       - name: Authenticate using Azure Access Control Service
         uses: thnetii/.github/actions/ms-acs-temp-client-secret-auth@main
         with:
