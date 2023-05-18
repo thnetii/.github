@@ -1,5 +1,4 @@
 const ghaCore = require('@actions/core');
-const ghaCommand = require('@actions/core/lib/command');
 const { HttpClient } = require('@actions/http-client');
 
 class GhaHttpClient extends HttpClient {
@@ -8,10 +7,10 @@ class GhaHttpClient extends HttpClient {
    * @type {HttpClient['requestRaw']}
    */
   async requestRaw(info, data) {
-    ghaCommand.issue('command', `${info.options.method} ${info.parsedUrl}`);
+    ghaCore.debug(` --> ${info.options.method} ${info.parsedUrl}`);
     const resp = await super.requestRaw(info, data);
     ghaCore.debug(
-      `HTTP/${resp.message.httpVersion} ${resp.message.statusCode} ${resp.message.statusMessage}`
+      `<-- HTTP/${resp.message.httpVersion} ${resp.message.statusCode} ${resp.message.statusMessage}`
     );
     return resp;
   }
