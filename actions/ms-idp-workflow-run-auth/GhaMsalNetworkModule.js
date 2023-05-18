@@ -1,4 +1,4 @@
-const { HttpClient, HttpClientError } = require('@actions/http-client');
+const { HttpClientError } = require('@actions/http-client');
 
 /** @typedef {import('@azure/msal-common').INetworkModule} INetworkModule */
 
@@ -17,8 +17,9 @@ function simplifyHeaders(headers) {
 
 /** @implements INetworkModule */
 class GhaMsalNetworkModule {
-  constructor() {
-    this.httpClient = new HttpClient();
+  /** @param {import('@actions/http-client').HttpClient} httpClient */
+  constructor(httpClient) {
+    this.httpClient = httpClient;
   }
 
   /**

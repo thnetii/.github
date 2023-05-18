@@ -1,58 +1,51 @@
 const ghaCore = require('@actions/core');
-const {
-  buildAppConfiguration,
-  ConfidentialClientApplication,
-  AzureCloudInstance,
-  AuthError,
-} = require('@azure/msal-node');
+const { AzureCloudInstance, AuthError } = require('@azure/msal-node');
 
 const { getInput } = require('@thnetii/gh-actions-core-helpers');
 
-const { GhaMsalNetworkModule } = require('./GhaMsalNetworkModule');
-const { loggerOptions } = require('./GhaMsalLogging');
+const { GhaHttpClient } = require('./GhaHttpClient');
+const { createMsalAppFromIdToken } = require('./GhaMsalAppProvider');
 
-const msalClientId = getInput('client-id', {
-  required: true,
-  trimWhitespace: true,
-});
-const msalTenantId = getInput('tenant-id', {
-  required: true,
-  trimWhitespace: true,
-});
-const msalInstance =
-  /** @type {AzureCloudInstance} */ (
-    getInput('instance', { required: false, trimWhitespace: true })
-  ) || AzureCloudInstance.AzurePublic;
-const msalResource =
-  getInput('resource', {
-    required: false,
-    trimWhitespace: true,
-  }) || msalClientId;
-
-/** @type {Parameters<import('@azure/msal-node')['buildAppConfiguration']>[0]} */
-const msalConfiguration = {
-  auth: {
-    clientId: msalClientId,
-    azureCloudOptions: {
-      azureCloudInstance: msalInstance,
-      tenant: msalTenantId,
-    },
-  },
-  system: {
-    networkClient: new GhaMsalNetworkModule(),
-    loggerOptions,
-  },
-};
-
-const getGithubActionsToken = async () => {
-  const ghaAudience = getInput('id-token-audience', {
-    required: false,
+function getActionInputs() {
+  const clientId = getInput('client-id', {
+    required: true,
     trimWhitespace: true,
   });
+  const tenantId = getInput('tenant-id', {
+    required: true,
+    trimWhitespace: true,
+  });
+  const instance =
+    /** @type {AzureCloudInstance} */ (
+      getInput('instance', { required: false, trimWhitespace: true })
+    ) || AzureCloudInstance.AzurePublic;
+  const resource =
+    getInput('resource', {
+      required: false,
+      trimWhitespace: true,
+    }) || clientId;
+  const idTokenAudience =
+    getInput('id-token-audience', {
+      required: false,
+      trimWhitespace: true,
+    }) || undefined;
+  return {
+    clientId,
+    tenantId,
+    instance,
+    resource,
+    idTokenAudience,
+  };
+}
+
+/**
+ * @param {string | undefined} [audience]
+ */
+async function getGithubActionsToken(audience) {
   ghaCore.debug(
-    `Requesting GitHub Actions ID token for audience: '${ghaAudience}'`
+    `Requesting GitHub Actions ID token for audience: '${audience}'`
   );
-  const ghaIdToken = await ghaCore.getIDToken(ghaAudience);
+  const ghaIdToken = await ghaCore.getIDToken(audience);
   if (ghaCore.isDebug()) {
     const [, ghaIdTokenBodyBase64 = '{}'] = ghaIdToken.split('.', 3);
     const ghaIdTokenBodyBuffer = Buffer.from(ghaIdTokenBodyBase64, 'base64url');
@@ -65,17 +58,17 @@ const getGithubActionsToken = async () => {
     );
   }
   return ghaIdToken;
-};
+}
 
-/** @param {string} ghaIdToken */
-const acquireMsalToken = async (ghaIdToken) => {
-  msalConfiguration.auth.clientAssertion = ghaIdToken;
-  const msalAppConfiguration = buildAppConfiguration(msalConfiguration);
-  const msalConfApp = new ConfidentialClientApplication(msalAppConfiguration);
+/**
+ * @param {import('@azure/msal-node').IConfidentialClientApplication} msalApp
+ * @param {string} resource
+ */
+async function acquireMsalToken(msalApp, resource) {
   let result;
   try {
-    result = await msalConfApp.acquireTokenByClientCredential({
-      scopes: [`${msalResource}/.default`],
+    result = await msalApp.acquireTokenByClientCredential({
+      scopes: [`${resource}/.default`],
     });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -86,18 +79,40 @@ const acquireMsalToken = async (ghaIdToken) => {
     throw error;
   }
   if (result === null) {
-    ghaCore.setFailed('MSAL authentication result is null');
-    return;
+    const authError = new AuthError(
+      undefined,
+      'MSAL authentication result is null'
+    );
+    ghaCore.setFailed(authError.message);
+    throw authError;
   }
-  ghaCore.setSecret(result.accessToken);
-  ghaCore.setOutput('result', result);
-  if (ghaCore.isDebug()) ghaCore.debug(JSON.stringify(result, undefined, 2));
-  ghaCore.setOutput('access-token', result.accessToken);
-};
+  const { accessToken } = result;
+  ghaCore.setSecret(accessToken);
+  const [, , signature] = accessToken.split('.', 3);
+  if (signature) ghaCore.setSecret(signature);
+  return result;
+}
 
-const run = async () => {
-  const ghaIdToken = await getGithubActionsToken();
-  acquireMsalToken(ghaIdToken);
-};
+async function run() {
+  const { clientId, tenantId, instance, resource, idTokenAudience } =
+    getActionInputs();
+  const idToken = await getGithubActionsToken(idTokenAudience);
+  const msalHttpClient = new GhaHttpClient();
+  try {
+    const msalApp = createMsalAppFromIdToken(
+      msalHttpClient,
+      clientId,
+      idToken,
+      tenantId,
+      instance
+    );
+    const result = await acquireMsalToken(msalApp, resource);
+    ghaCore.setOutput('result', result);
+    if (ghaCore.isDebug()) ghaCore.debug(JSON.stringify(result, undefined, 2));
+    ghaCore.setOutput('access-token', result.accessToken);
+  } finally {
+    msalHttpClient.dispose();
+  }
+}
 
 run();
