@@ -34,6 +34,10 @@ function getActionInputs() {
       required: false,
       trimWhitespace: true,
     }) || undefined;
+  ghaCore.saveState('client-id', clientId);
+  ghaCore.saveState('tenant-id', tenantId);
+  ghaCore.saveState('instance', instance);
+  ghaCore.saveState('id-token-audience', idTokenAudience);
   return {
     clientId,
     tenantId,

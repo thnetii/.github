@@ -50,3 +50,4 @@ runs:
   using: node16
   pre: setup.js
   main: action.js
+  post: cleanup.js
