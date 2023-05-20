@@ -1,10 +1,15 @@
 const ghaCore = require('@actions/core');
-const { AzureCloudInstance, AuthError } = require('@azure/msal-node');
+const {
+  AzureCloudInstance,
+  AuthError,
+  buildAppConfiguration,
+  ConfidentialClientApplication,
+} = require('@azure/msal-node');
 
 const { getInput } = require('@thnetii/gh-actions-core-helpers');
 
-const { GhaHttpClient } = require('./GhaHttpClient');
-const { createMsalAppFromIdToken } = require('./GhaMsalAppProvider');
+const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
+const { buildNodeSystemOptions } = require('@thnetii/gh-actions-msal-client');
 
 function getActionInputs() {
   const clientId = getInput('client-id', {
@@ -99,17 +104,26 @@ async function run() {
   const idToken = await getGithubActionsToken(idTokenAudience);
   const msalHttpClient = new GhaHttpClient();
   try {
-    const msalApp = createMsalAppFromIdToken(
-      msalHttpClient,
-      clientId,
-      idToken,
-      tenantId,
-      instance
-    );
+    const msalConfig = buildAppConfiguration({
+      auth: {
+        clientId,
+        azureCloudOptions: {
+          azureCloudInstance: instance,
+          tenant: tenantId,
+        },
+        clientAssertion: idToken,
+      },
+      system: buildNodeSystemOptions(msalHttpClient),
+    });
+    const msalApp = new ConfidentialClientApplication(msalConfig);
     const result = await acquireMsalToken(msalApp, resource);
+    const { accessToken } = result;
+    if (accessToken) ghaCore.setSecret(accessToken);
+    const [, , signature] = accessToken.split('.', 3);
+    if (signature) ghaCore.setSecret(signature);
+    ghaCore.setOutput('access-token', accessToken);
     ghaCore.setOutput('result', result);
     if (ghaCore.isDebug()) ghaCore.debug(JSON.stringify(result, undefined, 2));
-    ghaCore.setOutput('access-token', result.accessToken);
   } finally {
     msalHttpClient.dispose();
   }
