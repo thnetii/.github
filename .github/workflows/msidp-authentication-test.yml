@@ -28,14 +28,14 @@ jobs:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
           resource: ${{ inputs.resource }}
-  acs:
-    name: Acquire Azure ACS Access Token
+  msal-tmp-cert:
+    name: Acquire Azure AD Access Token (using temporary certificate)
     runs-on: ubuntu-latest
     steps:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
       - name: Authenticate using GitHub action
-        uses: thnetii/.github/actions/ms-idp-workflow-run-auth@library-packages
+        uses: thnetii/.github/actions/ms-idp-workflow-run-auth@main
         with:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
