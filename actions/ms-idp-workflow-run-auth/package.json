@@ -36,5 +36,8 @@
     "@thnetii/gh-actions-core-helpers": "*",
     "@thnetii/gh-actions-http-client": "*",
     "@thnetii/gh-actions-msal-client": "*"
+  },
+  "devDependencies": {
+    "@microsoft/microsoft-graph-types": "^2.32.0"
   }
 }
