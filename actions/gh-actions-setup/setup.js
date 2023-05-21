@@ -5,6 +5,14 @@ const path = require('path');
 module.exports = (actionPath) => {
   const repoRootPath = path.resolve(path.join(__dirname, '..', '..'));
   const workspacePath = path.relative(repoRootPath, actionPath);
+  execSync(`node -v`, {
+    cwd: repoRootPath,
+    stdio: [process.stdin, process.stdout, process.stderr],
+  });
+  execSync(`npm -v`, {
+    cwd: repoRootPath,
+    stdio: [process.stdin, process.stdout, process.stderr],
+  });
   execSync(`npm install --workspace ${workspacePath} --omit=dev`, {
     cwd: repoRootPath,
     stdio: [process.stdin, process.stdout, process.stderr],
