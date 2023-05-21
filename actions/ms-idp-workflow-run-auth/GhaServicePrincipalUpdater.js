@@ -8,6 +8,7 @@ const {
 const httpClientSym = Symbol('#httpClient');
 const spnUrlSym = Symbol('#spnUrl');
 const removeKeyCredentialByKeyIdSym = Symbol('#removeKeyCredentialByKeyId');
+const addCertificateKeyCredentialSym = Symbol('#addCertificateKeyCredential');
 
 class GhaServicePrincipalUpdater {
   /**
@@ -49,9 +50,11 @@ class GhaServicePrincipalUpdater {
    */
   async [removeKeyCredentialByKeyIdSym](keyId, $retry) {
     const {
-      result: { keyCredentials },
+      result: spnEntity,
       headers: { etag },
     } = await this.getKeyCredentials();
+    let { keyCredentials } = spnEntity;
+    if (!Array.isArray(keyCredentials)) keyCredentials = [];
 
     const keyIdx = keyCredentials.findIndex((c) => c.keyId === keyId);
     if (keyIdx < 0) return;
@@ -79,6 +82,70 @@ class GhaServicePrincipalUpdater {
    */
   removeKeyCredentialByKeyId(keyId) {
     return this[removeKeyCredentialByKeyIdSym](keyId, 0);
+  }
+
+  /**
+   * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider')['generateCertificate']>>} keyPair
+   * @param {number} $retry
+   * @returns {Promise<import('@microsoft/microsoft-graph-types').KeyCredential>}
+   */
+  async [addCertificateKeyCredentialSym](keyPair, $retry) {
+    const {
+      result: spnEntity,
+      headers: { etag },
+    } = await this.getKeyCredentials();
+    let { keyCredentials } = spnEntity;
+    if (!Array.isArray(keyCredentials)) keyCredentials = [];
+
+    keyCredentials.push({
+      key: keyPair.certificate,
+      keyId: keyPair.uuid,
+      customKeyIdentifier: keyPair.x509.fingerprint256,
+      startDateTime: keyPair.x509.validFrom,
+      endDateTime: keyPair.x509.validTo,
+      displayName: keyPair.x509.subject,
+      type: 'AsymmetricX509Cert',
+      usage: 'Verify',
+    });
+
+    try {
+      /**
+       * @type {import('@actions/http-client/lib/interfaces').TypedResponse<
+       *  Required<Pick<import('@microsoft/microsoft-graph-types').ServicePrincipal, 'keyCredentials'>>
+       * >}
+       */
+      const patchResp = await this[httpClientSym].patchJson(
+        this[spnUrlSym],
+        { keyCredentials },
+        { 'If-Match': etag || '*' }
+      );
+      if (patchResp.result && Array.isArray(patchResp.result.keyCredentials)) {
+        keyCredentials = patchResp.result.keyCredentials;
+      } else {
+        keyCredentials = (await this.getKeyCredentials()).result.keyCredentials;
+      }
+    } catch (err) {
+      if (err instanceof HttpClientError && err.statusCode === 412) {
+        return this[addCertificateKeyCredentialSym](keyPair, $retry + 1);
+      }
+      throw err;
+    }
+
+    const keyCredential = keyCredentials.find(
+      (k) => k.customKeyIdentifier === keyPair.x509.fingerprint256
+    );
+    if (!keyCredential)
+      throw new Error(
+        'Failed to update service principal with new key credential'
+      );
+    return keyCredential;
+  }
+
+  /**
+   * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider')['generateCertificate']>>} certificate
+   */
+  addCertificateKeyCredential(certificate) {
+    return this[addCertificateKeyCredentialSym](certificate, 0);
   }
 
   dispose() {

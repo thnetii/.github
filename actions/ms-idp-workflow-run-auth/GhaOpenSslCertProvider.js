@@ -52,8 +52,7 @@ module.exports = {
       uuid,
       privateKey: prvKeyPem,
       certificate: pubCerPem,
-      commonName: x509.subject,
-      thumbprint: x509.fingerprint256,
+      x509,
     };
   },
 };
