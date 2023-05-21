@@ -1,5 +1,5 @@
 const ghaCore = require('@actions/core');
-const { ClientAssertion, CryptoProvider } = require('@azure/msal-node');
+const { AuthError } = require('@azure/msal-node');
 
 const { saveState } = require('@thnetii/gh-actions-core-helpers');
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
@@ -13,6 +13,7 @@ const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater');
  * @param {import('@actions/http-client').HttpClient} httpClient
  */
 async function acquireAccessToken(httpClient) {
+  let maxAttempts = 1;
   const {
     clientId,
     tenantId,
@@ -31,6 +32,7 @@ async function acquireAccessToken(httpClient) {
   );
 
   if (useClientCertificate) {
+    maxAttempts = 60;
     const keyPair = await generateCertificate();
     let keyCredential;
     const spnUpdater = new GhaServicePrincipalUpdater(msalApp, clientId);
@@ -48,31 +50,6 @@ async function acquireAccessToken(httpClient) {
       setTimeout(resolve, 15000);
     });
 
-    if (ghaCore.isDebug()) {
-      const assertion = ClientAssertion.fromCertificate(
-        keyPair.thumbprint.toString('hex'),
-        keyPair.privateKey
-      );
-      const cryptoProvider = new CryptoProvider();
-      const jwtString = assertion.getJwt(
-        cryptoProvider,
-        clientId,
-        `${instance}/${tenantId}/oauth2/v2.0/token`
-      );
-      const [headerBase64, bodyBase64] = jwtString.split('.', 3);
-      ghaCore.debug(
-        `Certificate Assertion Header: ${Buffer.from(
-          headerBase64 || '',
-          'base64url'
-        ).toString('utf-8')}`
-      );
-      ghaCore.debug(
-        `Certificate Assertion Body: ${Buffer.from(
-          bodyBase64 || '',
-          'base64url'
-        ).toString('utf-8')}`
-      );
-    }
     ghaCore.debug(
       'Replacing MSAL application with a new application using the temporary certificate for client authentication'
     );
@@ -89,11 +66,43 @@ async function acquireAccessToken(httpClient) {
     );
   }
 
-  const result = await msalApp.acquireAccessToken(resource);
-  const { accessToken } = result;
+  let error;
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    let result;
+    try {
+      if (attempt > 0) {
+        ghaCore.info(
+          `Authentication attempt ${attempt} failed. Waiting 5 seconds for the system to propagate possibly missing credentials.`
+        );
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => {
+          setTimeout(resolve, 5000);
+        });
+      }
+      // eslint-disable-next-line no-await-in-loop
+      result = await msalApp.acquireAccessToken(resource);
+    } catch (err) {
+      if (err instanceof AuthError) {
+        error = err;
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      throw err;
+    }
+    if (!result) {
+      error = new AuthError(undefined, 'No Authentication result received');
+      // eslint-disable-next-line no-continue
+      continue;
+    }
 
-  ghaCore.setOutput('access-token', accessToken);
-  ghaCore.setOutput('result', result);
+    const { accessToken } = result;
+
+    ghaCore.setOutput('access-token', accessToken);
+    ghaCore.setOutput('result', result);
+    return;
+  }
+
+  throw error;
 }
 
 async function run() {
