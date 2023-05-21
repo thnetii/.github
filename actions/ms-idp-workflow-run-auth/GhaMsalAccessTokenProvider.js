@@ -8,9 +8,29 @@ const {
 
 const { buildNodeSystemOptions } = require('@thnetii/gh-actions-msal-client');
 
-const { onJwtToken } = require('./utils');
-
 const clientIdSym = Symbol('#clientId');
+
+/** @param {string} token */
+function onJwtToken(token) {
+  if (!token) return;
+  ghaCore.setSecret(token);
+  const [, body, signature] = token.split('.', 3);
+  // Special protection for the token signature.
+  // Without it the rest of the token is safe to be displayed.
+  if (signature) ghaCore.setSecret(signature);
+  if (ghaCore.isDebug()) {
+    if (body) {
+      try {
+        const bodyDecoded = Buffer.from(body, 'base64url').toString('utf-8');
+        ghaCore.debug(`JWT: ${bodyDecoded}`);
+      } catch {
+        ghaCore.debug(`JWT-ish (body is not Base64 encoded): ${body}`);
+      }
+    } else {
+      ghaCore.debug('Non JWT received.');
+    }
+  }
+}
 
 class GhaMsalAccessTokenProvider {
   /**
@@ -47,7 +67,6 @@ class GhaMsalAccessTokenProvider {
    */
   async acquireAccessToken(resource) {
     const { msalApp } = this;
-    ghaCore.debug('Acquiring MSAL access token . . .');
     if (!resource) {
       // eslint-disable-next-line no-param-reassign
       resource = this[clientIdSym];
@@ -55,11 +74,13 @@ class GhaMsalAccessTokenProvider {
         `No resource requested for access token audience, using client id instead.`
       );
     }
+    ghaCore.info(`Acquiring MSAL access token for resource '${resource}'. . .`);
     const authResult = await msalApp.acquireTokenByClientCredential({
       scopes: [`${resource || this[clientIdSym]}/.default`],
     });
     if (!authResult)
       throw new AuthError(undefined, 'Authentication result is null');
+    ghaCore.info('Sucessfully acquired MSAL access token.');
     const { accessToken, scopes } = authResult;
     onJwtToken(accessToken);
     if (ghaCore.isDebug()) {

@@ -1,67 +1,11 @@
 const ghaCore = require('@actions/core');
-const { AzureCloudInstance } = require('@azure/msal-node');
-
-const { getInput } = require('@thnetii/gh-actions-core-helpers');
 
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
-const { getGithubActionsToken } = require('./utils');
+const { getActionInputs, getGithubActionsToken } = require('./utils');
 const { GhaMsalAccessTokenProvider } = require('./GhaMsalAccessTokenProvider');
 const { generateCertificate } = require('./GhaOpenSslCertProvider');
 const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater');
-
-function getActionInputs() {
-  const clientId = getInput('client-id', {
-    required: true,
-    trimWhitespace: true,
-  });
-  const tenantId = getInput('tenant-id', {
-    required: true,
-    trimWhitespace: true,
-  });
-  const instance =
-    /** @type {AzureCloudInstance} */ (
-      getInput('instance', { required: false, trimWhitespace: true })
-    ) || AzureCloudInstance.AzurePublic;
-  const resource =
-    getInput('resource', {
-      required: false,
-      trimWhitespace: true,
-    }) || clientId;
-  const idTokenAudience =
-    getInput('id-token-audience', {
-      required: false,
-      trimWhitespace: true,
-    }) || undefined;
-  let useClientCertificate;
-  try {
-    useClientCertificate = JSON.parse(
-      getInput('use-client-certificate', {
-        required: false,
-        trimWhitespace: true,
-      }) || 'false'
-    );
-  } finally {
-    if (typeof useClientCertificate !== 'boolean') {
-      ghaCore.error(
-        `Invalid input for 'use-client-certificate'. Input value is not a boolean JSON value.`
-      );
-      useClientCertificate = false;
-    }
-  }
-  ghaCore.saveState('client-id', clientId);
-  ghaCore.saveState('tenant-id', tenantId);
-  ghaCore.saveState('instance', instance);
-  ghaCore.saveState('id-token-audience', idTokenAudience);
-  return {
-    clientId,
-    tenantId,
-    instance,
-    resource,
-    idTokenAudience,
-    useClientCertificate,
-  };
-}
 
 /**
  * @param {import('@actions/http-client').HttpClient} httpClient
@@ -87,17 +31,18 @@ async function acquireAccessToken(httpClient) {
   if (useClientCertificate) {
     const keyPair = await generateCertificate();
     let keyCredential;
-    const spnUpdater = new GhaServicePrincipalUpdater(
-      msalApp.msalApp,
-      clientId
-    );
+    const spnUpdater = new GhaServicePrincipalUpdater(msalApp, clientId);
     try {
       keyCredential = await spnUpdater.addCertificateKeyCredential(keyPair);
     } finally {
-      spnUpdater.dispose();
+      await spnUpdater.dispose();
     }
+    ghaCore.debug('Registering keyCredential for post-job cleanup.');
     ghaCore.saveState('keyCredential-keyId', keyCredential?.keyId || '');
 
+    ghaCore.debug(
+      'Replacing MSAL application with a new application using the temporary certificate for client authentication'
+    );
     msalApp = new GhaMsalAccessTokenProvider(
       httpClient,
       clientId,
