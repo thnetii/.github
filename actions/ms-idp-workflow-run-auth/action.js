@@ -1,4 +1,5 @@
 const ghaCore = require('@actions/core');
+const { ClientAssertion, CryptoProvider } = require('@azure/msal-node');
 
 const { saveState } = require('@thnetii/gh-actions-core-helpers');
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
@@ -47,6 +48,19 @@ async function acquireAccessToken(httpClient) {
       setTimeout(resolve, 15000);
     });
 
+    if (ghaCore.isDebug()) {
+      const assertion = ClientAssertion.fromCertificate(
+        keyPair.thumbprint.toString('hex'),
+        keyPair.privateKey
+      );
+      const cryptoProvider = new CryptoProvider();
+      const jwtString = assertion.getJwt(
+        cryptoProvider,
+        clientId,
+        `${instance}/${tenantId}/oauth2/v2.0/token`
+      );
+      ghaCore.debug(`Certificate Assertion: ${jwtString}`);
+    }
     ghaCore.debug(
       'Replacing MSAL application with a new application using the temporary certificate for client authentication'
     );
@@ -56,7 +70,7 @@ async function acquireAccessToken(httpClient) {
       {
         privateKey: keyPair.privateKey,
         thumbprint: keyPair.thumbprint.toString('hex'),
-        x5c: keyPair.certificate,
+        // x5c: keyPair.certificate,
       },
       tenantId,
       instance
