@@ -46,8 +46,8 @@ function getActionInputs() {
       ghaCore.error(
         `Invalid input for 'use-client-certificate'. Input value is not a boolean JSON value.`
       );
+      useClientCertificate = false;
     }
-    useClientCertificate = false;
   }
   ghaCore.saveState('client-id', clientId);
   ghaCore.saveState('tenant-id', tenantId);
