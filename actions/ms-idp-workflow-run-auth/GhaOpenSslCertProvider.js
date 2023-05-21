@@ -58,8 +58,10 @@ module.exports = {
     const thumbprint = Buffer.from(
       x509.fingerprint256.replaceAll(':', ''),
       'hex'
-    ).toString('base64');
-    ghaCore.info(`Generated certificate with thumbprint: ${thumbprint}`);
+    );
+    ghaCore.info(
+      `Generated certificate with thumbprint: ${thumbprint.toString('base64')}`
+    );
     return {
       uuid,
       privateKey: prvKeyPem,

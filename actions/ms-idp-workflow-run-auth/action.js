@@ -1,5 +1,6 @@
 const ghaCore = require('@actions/core');
 
+const { saveState } = require('@thnetii/gh-actions-core-helpers');
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
 const { getActionInputs, getGithubActionsToken } = require('./utils');
@@ -37,8 +38,7 @@ async function acquireAccessToken(httpClient) {
     } finally {
       await spnUpdater.dispose();
     }
-    ghaCore.debug('Registering keyCredential for post-job cleanup.');
-    ghaCore.saveState('key-credential-id', keyCredential?.keyId || '');
+    saveState('key-credential-id', keyCredential?.keyId);
 
     ghaCore.debug(
       'Replacing MSAL application with a new application using the temporary certificate for client authentication'
@@ -48,7 +48,7 @@ async function acquireAccessToken(httpClient) {
       clientId,
       {
         privateKey: keyPair.privateKey,
-        thumbprint: keyPair.x509.fingerprint,
+        thumbprint: keyPair.thumbprint.toString('hex'),
         x5c: keyPair.certificate,
       },
       tenantId,

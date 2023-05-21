@@ -61,6 +61,16 @@ module.exports = {
 
   /**
    * @param {string} name
+   * @param {Parameters<import('@actions/core')['saveState']>[1]} value
+   */
+  saveState(name, value) {
+    ghaCore.saveState(name, value);
+    ghaCore.debug(`STATE ${name} = ${value}`);
+    return value;
+  },
+
+  /**
+   * @param {string} name
    */
   getState(name) {
     const value = ghaCore.getState(name);

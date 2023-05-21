@@ -98,9 +98,10 @@ class GhaServicePrincipalUpdater {
     if (!Array.isArray(keyCredentials)) keyCredentials = [];
 
     ghaCore.debug('Adding certificate to list of registered keyCredentials');
+    const thumbprint = keyPair.thumbprint.toString('base64');
     keyCredentials.push({
       key: keyPair.x509.raw.toString('base64'),
-      customKeyIdentifier: keyPair.thumbprint,
+      customKeyIdentifier: thumbprint,
       startDateTime: new Date(keyPair.x509.validFrom).toISOString(),
       endDateTime: new Date(keyPair.x509.validTo).toISOString(),
       displayName: keyPair.x509.subject,
@@ -126,7 +127,7 @@ class GhaServicePrincipalUpdater {
     }
 
     const keyCredential = keyCredentials.find(
-      (k) => k.customKeyIdentifier === keyPair.thumbprint
+      (k) => k.customKeyIdentifier === thumbprint
     );
     if (!keyCredential)
       throw new Error(

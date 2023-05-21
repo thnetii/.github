@@ -21,7 +21,9 @@ async function cleanup() {
     ghaCore.info('No temporary keyCredential registered for cleanup.');
     return;
   }
-  ghaCore.info('Detected keyCredential previously registered for cleanup');
+  ghaCore.info(
+    `Detected keyCredential previously registered for cleanup. keyId: ${keyId}`
+  );
 
   const idToken = await getGithubActionsToken(idTokenAudience);
   const msalHttpClient = new GhaHttpClient();
