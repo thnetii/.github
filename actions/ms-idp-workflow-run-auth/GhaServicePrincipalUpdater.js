@@ -101,7 +101,7 @@ class GhaServicePrincipalUpdater {
     keyCredentials.push({
       key: keyPair.x509.raw.toString('base64'),
       keyId: keyPair.uuid,
-      customKeyIdentifier: keyPair.x509.fingerprint256,
+      customKeyIdentifier: keyPair.thumbprint,
       startDateTime: keyPair.x509.validFrom,
       endDateTime: keyPair.x509.validTo,
       displayName: keyPair.x509.subject,
@@ -127,7 +127,7 @@ class GhaServicePrincipalUpdater {
     }
 
     const keyCredential = keyCredentials.find(
-      (k) => k.customKeyIdentifier === keyPair.x509.fingerprint256
+      (k) => k.customKeyIdentifier === keyPair.thumbprint
     );
     if (!keyCredential)
       throw new Error(

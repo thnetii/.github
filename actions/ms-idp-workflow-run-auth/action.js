@@ -48,7 +48,7 @@ async function acquireAccessToken(httpClient) {
       clientId,
       {
         privateKey: keyPair.privateKey,
-        thumbprint: keyPair.x509.fingerprint256,
+        thumbprint: keyPair.thumbprint,
         x5c: keyPair.certificate,
       },
       tenantId,

@@ -55,13 +55,16 @@ module.exports = {
     ghaCore.debug('Deleting generated certificate PEM file.');
     await fs.rm(pubCerPath, { force: true });
     const x509 = new crypto.X509Certificate(pubCerPem);
-    ghaCore.info(
-      `Generated certificate with thumbprint: ${x509.fingerprint256}`
-    );
+    const thumbprint = Buffer.from(
+      x509.fingerprint256.replaceAll(':', ''),
+      'hex'
+    ).toString('base64');
+    ghaCore.info(`Generated certificate with thumbprint: ${thumbprint}`);
     return {
       uuid,
       privateKey: prvKeyPem,
       certificate: pubCerPem,
+      thumbprint,
       x509,
     };
   },
