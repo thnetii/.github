@@ -6,8 +6,6 @@ const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
 const httpClientSym = Symbol('#httpClient');
 const spnUrlSym = Symbol('#spnUrl');
-const removeKeyCredentialByKeyIdSym = Symbol('#removeKeyCredentialByKeyId');
-const addCertificateKeyCredentialSym = Symbol('#addCertificateKeyCredential');
 
 /**
  *
@@ -60,14 +58,13 @@ class GhaServicePrincipalUpdater {
 
   /**
    * @param {string} keyId
-   * @param {number} $retry
    */
-  async [removeKeyCredentialByKeyIdSym](keyId, $retry) {
+  async removeKeyCredentialByKeyId(keyId) {
+    ghaCore.info(
+      'Removing certificate from Microsoft Graph service principal entity'
+    );
     const httpClient = await this[httpClientSym];
-    const {
-      result: spnEntity,
-      headers: { etag },
-    } = await this.getKeyCredentials();
+    const { result: spnEntity } = await this.getKeyCredentials();
     let { keyCredentials } = spnEntity;
     if (!Array.isArray(keyCredentials)) keyCredentials = [];
 
@@ -78,50 +75,25 @@ class GhaServicePrincipalUpdater {
     if (keyIdx < 0) return;
     keyCredentials.splice(keyIdx, 1);
 
-    try {
-      ghaCore.debug(
-        'Updating Microsoft Graph service principal entity with modified keyCredentials list'
-      );
-      // @ts-ignore
-      // eslint-disable-next-line no-unused-vars
-      const patchResp = await httpClient.patchJson(
-        this[spnUrlSym],
-        { keyCredentials },
-        { 'If-Match': etag || '*' }
-      );
-    } catch (err) {
-      if (err instanceof HttpClientError && err.statusCode === 412) {
-        ghaCore.debug(
-          'Optimistic concurrency check failed. Service principal entity has been updated by other party. Retrying.'
-        );
-        await this[removeKeyCredentialByKeyIdSym](keyId, $retry + 1);
-        return;
-      }
-      throw err;
-    }
-  }
-
-  /**
-   * @param {string} keyId
-   */
-  removeKeyCredentialByKeyId(keyId) {
-    ghaCore.info(
-      'Removing certificate from Microsoft Graph service principal entity'
+    ghaCore.debug(
+      'Updating Microsoft Graph service principal entity with modified keyCredentials list'
     );
-    return this[removeKeyCredentialByKeyIdSym](keyId, 0);
+    // @ts-ignore
+    // eslint-disable-next-line no-unused-vars
+    const patchResp = await httpClient.patchJson(this[spnUrlSym], {
+      keyCredentials,
+    });
   }
 
   /**
    * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider')['generateCertificate']>>} keyPair
-   * @param {number} $retry
-   * @returns {Promise<import('@microsoft/microsoft-graph-types').KeyCredential>}
    */
-  async [addCertificateKeyCredentialSym](keyPair, $retry) {
+  async addCertificateKeyCredential(keyPair) {
+    ghaCore.info(
+      'Adding certificate to Microsoft Graph service principal entity'
+    );
     const httpClient = await this[httpClientSym];
-    const {
-      result: spnEntity,
-      headers: { etag },
-    } = await this.getKeyCredentials();
+    const { result: spnEntity } = await this.getKeyCredentials();
     let { keyCredentials } = spnEntity;
     if (!Array.isArray(keyCredentials)) keyCredentials = [];
 
@@ -137,33 +109,21 @@ class GhaServicePrincipalUpdater {
       usage: 'Verify',
     });
 
-    try {
-      ghaCore.debug(
-        'Updating Microsoft Graph service principal entity with modified keyCredentials list'
-      );
-      /**
-       * @type {import('@actions/http-client/lib/interfaces').TypedResponse<
-       *  Required<Pick<import('@microsoft/microsoft-graph-types').ServicePrincipal, 'keyCredentials'>>
-       * >}
-       */
-      const patchResp = await httpClient.patchJson(
-        this[spnUrlSym],
-        { keyCredentials },
-        { 'If-Match': etag || '*' }
-      );
-      if (patchResp.result && Array.isArray(patchResp.result.keyCredentials)) {
-        keyCredentials = patchResp.result.keyCredentials;
-      } else {
-        keyCredentials = (await this.getKeyCredentials()).result.keyCredentials;
-      }
-    } catch (err) {
-      if (err instanceof HttpClientError && err.statusCode === 412) {
-        ghaCore.debug(
-          'Optimistic concurrency check failed. Service principal entity has been updated by other party. Retrying.'
-        );
-        return this[addCertificateKeyCredentialSym](keyPair, $retry + 1);
-      }
-      throw err;
+    ghaCore.debug(
+      'Updating Microsoft Graph service principal entity with modified keyCredentials list'
+    );
+    /**
+     * @type {import('@actions/http-client/lib/interfaces').TypedResponse<
+     *  Required<Pick<import('@microsoft/microsoft-graph-types').ServicePrincipal, 'keyCredentials'>>
+     * >}
+     */
+    const patchResp = await httpClient.patchJson(this[spnUrlSym], {
+      keyCredentials,
+    });
+    if (patchResp.result && Array.isArray(patchResp.result.keyCredentials)) {
+      keyCredentials = patchResp.result.keyCredentials;
+    } else {
+      keyCredentials = (await this.getKeyCredentials()).result.keyCredentials;
     }
 
     const keyCredential = keyCredentials.find(
@@ -177,16 +137,6 @@ class GhaServicePrincipalUpdater {
       `Certificate added to service principal entity. keyId: ${keyCredential.keyId}`
     );
     return keyCredential;
-  }
-
-  /**
-   * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider')['generateCertificate']>>} certificate
-   */
-  addCertificateKeyCredential(certificate) {
-    ghaCore.info(
-      'Adding certificate to Microsoft Graph service principal entity'
-    );
-    return this[addCertificateKeyCredentialSym](certificate, 0);
   }
 
   async dispose() {
