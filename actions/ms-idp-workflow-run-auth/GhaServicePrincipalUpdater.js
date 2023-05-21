@@ -100,7 +100,6 @@ class GhaServicePrincipalUpdater {
     ghaCore.debug('Adding certificate to list of registered keyCredentials');
     keyCredentials.push({
       key: keyPair.x509.raw.toString('base64'),
-      keyId: keyPair.uuid,
       customKeyIdentifier: keyPair.thumbprint,
       startDateTime: new Date(keyPair.x509.validFrom).toISOString(),
       endDateTime: new Date(keyPair.x509.validTo).toISOString(),
