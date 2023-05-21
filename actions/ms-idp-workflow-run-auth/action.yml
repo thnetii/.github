@@ -34,6 +34,19 @@ inputs:
       resource to which access is granted.
       Example: For Microsoft Graph the value is: https://graph.microsoft.com
       If omitted or empty, the audience will be set to the client id.
+  use-client-certificate:
+    default: 'false'
+    description: |
+      Some service (e.g. SharePoint Online) do not support authentication with
+      federated credentials. If `use-client-certificate` is `true`, the action
+      will create a temporary certificate and obtain an access token using that
+      certificate.
+      The application needs Microsoft Graph permissions to modify the
+      application. For example the `Application.ReadWrite.OwnedBy`. This
+      permission also requires the application being one of the owners of its
+      service principal.
+      The generated certificate will be removed once the job running this action
+      terminates.
 outputs:
   access-token:
     description: >
@@ -50,3 +63,4 @@ runs:
   using: node16
   pre: setup.js
   main: action.js
+  post: cleanup.js

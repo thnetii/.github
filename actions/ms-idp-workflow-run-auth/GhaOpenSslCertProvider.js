@@ -3,6 +3,7 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const crypto = require('node:crypto');
 
+const ghaCore = require('@actions/core');
 const { exec } = require('@actions/exec');
 
 const {
@@ -28,6 +29,7 @@ module.exports = {
     const uuid = crypto.randomUUID();
     const prvKeyPath = path.join(runnerTempDir, `${uuid}.key`);
     const pubCerPath = path.join(runnerTempDir, `${uuid}.cer`);
+    ghaCore.info('Generating temporary self-signed certificate . . .');
     await exec('openssl', [
       'req',
       '-x509',
@@ -42,18 +44,27 @@ module.exports = {
       pubCerPath,
       '-keyout',
       prvKeyPath,
+      '-verbose',
     ]);
+    ghaCore.debug('Reading generated private key file contents.');
     const prvKeyPem = await fs.readFile(prvKeyPath, 'ascii');
+    ghaCore.debug('Deleting generated private key file.');
     await fs.rm(prvKeyPath, { force: true });
+    ghaCore.debug('Reading generated certificate PEM file.');
     const pubCerPem = await fs.readFile(pubCerPath, 'ascii');
+    ghaCore.debug('Deleting generated certificate PEM file.');
     await fs.rm(pubCerPath, { force: true });
     const x509 = new crypto.X509Certificate(pubCerPem);
+    const thumbprint = Buffer.from(x509.fingerprint.replaceAll(':', ''), 'hex');
+    ghaCore.info(
+      `Generated certificate with thumbprint: ${thumbprint.toString('base64')}`
+    );
     return {
       uuid,
       privateKey: prvKeyPem,
       certificate: pubCerPem,
-      commonName: x509.subject,
-      thumbprint: x509.fingerprint256,
+      thumbprint,
+      x509,
     };
   },
 };

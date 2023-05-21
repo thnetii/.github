@@ -17,7 +17,8 @@
   "license": "MIT",
   "workspaces": [
     ".submodules/GitHub/thnetii/eslint-config/src/eslint-config-node-base",
-    "actions/*"
+    "actions/*",
+    "lib/*"
   ],
   "scripts": {
     "lint": "npm-run-all --continue-on-error lint:*",

@@ -28,31 +28,16 @@ jobs:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
           resource: ${{ inputs.resource }}
-  acs:
-    name: Acquire Azure ACS Access Token
+  msal-tmp-cert:
+    name: Acquire Azure AD Access Token (using temporary certificate)
     runs-on: ubuntu-latest
     steps:
       - name: Setup Github Actions for Node.js
         uses: actions/setup-node@v3
-      - id: msgraph-auth
-        name: Authenticate using GitHub action
+      - name: Authenticate using GitHub action
         uses: thnetii/.github/actions/ms-idp-workflow-run-auth@main
         with:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
-          resource: https://graph.microsoft.com
-      - name: Print Microsoft Graph Access Token Body
-        shell: pwsh
-        if: runner.debug
-        run: |
-          [string[]]$TokenParts = ([string]$ENV:MSGRAPH_ACCESS_TOKEN).Split(".")
-          Write-Host ".$($TokenParts[1])."
-        env:
-          MSGRAPH_ACCESS_TOKEN: ${{ steps.msgraph-auth.outputs.access-token }}
-      - name: Authenticate using Azure Access Control Service
-        uses: thnetii/.github/actions/ms-acs-temp-client-secret-auth@main
-        with:
-          tenant-id: ${{ inputs.tenant-id }}
-          client-id: ${{ inputs.client-id }}
-          resource-id: ${{ inputs.resource }}
-          msgraph-access-token: ${{ steps.msgraph-auth.outputs.access-token }}
+          resource: ${{ inputs.resource }}
+          use-client-certificate: 'true'
