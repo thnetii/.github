@@ -58,4 +58,13 @@ module.exports = {
     }
     return npmExecArgs;
   },
+
+  /**
+   * @param {string} name
+   */
+  getState(name) {
+    const value = ghaCore.getState(name);
+    ghaCore.debug(`STATE ${name}: ${value}`);
+    return value;
+  },
 };

@@ -38,7 +38,7 @@ async function acquireAccessToken(httpClient) {
       await spnUpdater.dispose();
     }
     ghaCore.debug('Registering keyCredential for post-job cleanup.');
-    ghaCore.saveState('keyCredential-keyId', keyCredential?.keyId || '');
+    ghaCore.saveState('key-credential-id', keyCredential?.keyId || '');
 
     ghaCore.debug(
       'Replacing MSAL application with a new application using the temporary certificate for client authentication'

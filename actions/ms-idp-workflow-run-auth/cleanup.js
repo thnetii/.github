@@ -1,5 +1,6 @@
 const ghaCore = require('@actions/core');
 
+const ghaHelpers = require('@thnetii/gh-actions-core-helpers');
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
 const { getActionInputs, getGithubActionsToken } = require('./utils');
@@ -7,7 +8,7 @@ const { GhaMsalAccessTokenProvider } = require('./GhaMsalAccessTokenProvider');
 const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater');
 
 function getState() {
-  const keyId = ghaCore.getState('keyCredential-keyId');
+  const keyId = ghaHelpers.getState('key-credential-id');
   return {
     keyId,
     ...getActionInputs(),
