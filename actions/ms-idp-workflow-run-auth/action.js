@@ -59,7 +59,19 @@ async function acquireAccessToken(httpClient) {
         clientId,
         `${instance}/${tenantId}/oauth2/v2.0/token`
       );
-      ghaCore.debug(`Certificate Assertion: ${jwtString}`);
+      const [headerBase64, bodyBase64] = jwtString.split('.', 3);
+      ghaCore.debug(
+        `Certificate Assertion Header: ${Buffer.from(
+          headerBase64 || '',
+          'base64url'
+        ).toString('utf-8')}`
+      );
+      ghaCore.debug(
+        `Certificate Assertion Body: ${Buffer.from(
+          bodyBase64 || '',
+          'base64url'
+        ).toString('utf-8')}`
+      );
     }
     ghaCore.debug(
       'Replacing MSAL application with a new application using the temporary certificate for client authentication'

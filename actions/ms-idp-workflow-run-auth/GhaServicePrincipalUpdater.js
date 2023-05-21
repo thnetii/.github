@@ -74,6 +74,9 @@ class GhaServicePrincipalUpdater {
     const keyIdx = keyCredentials.findIndex((c) => c.keyId === keyId);
     if (keyIdx < 0) return;
     keyCredentials.splice(keyIdx, 1);
+    for (const existingKeyCredential of keyCredentials) {
+      delete existingKeyCredential.key;
+    }
 
     ghaCore.debug(
       'Updating Microsoft Graph service principal entity with modified keyCredentials list'
@@ -99,6 +102,9 @@ class GhaServicePrincipalUpdater {
 
     ghaCore.debug('Adding certificate to list of registered keyCredentials');
     const thumbprint = keyPair.thumbprint.toString('base64');
+    for (const existingKeyCredential of keyCredentials) {
+      delete existingKeyCredential.key;
+    }
     keyCredentials.push({
       key: keyPair.x509.raw.toString('base64'),
       customKeyIdentifier: thumbprint,
