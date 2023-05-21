@@ -40,6 +40,13 @@ async function acquireAccessToken(httpClient) {
     }
     saveState('key-credential-id', keyCredential?.keyId);
 
+    ghaCore.info(
+      'Waiting for 15 seconds for the certificate to propagate throughut the system.'
+    );
+    await new Promise((resolve) => {
+      setTimeout(resolve, 15000);
+    });
+
     ghaCore.debug(
       'Replacing MSAL application with a new application using the temporary certificate for client authentication'
     );
