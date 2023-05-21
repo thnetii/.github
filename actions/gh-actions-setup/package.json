@@ -20,6 +20,9 @@
   },
   "homepage": "https://github.com/thnetii/.github#readme",
   "license": "MIT",
+  "engines": {
+    "node": ">= 16"
+  },
   "main": "setup.js",
   "type": "commonjs"
 }
