@@ -33,7 +33,7 @@
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/exec": "^1.1.1",
-    "@thnetii/gh-actions-core-helpers": "*",
+    "@thnetii/gh-actions-core-helpers": "file:../gh-actions-core-helpers",
     "setup-node": "github:actions/setup-node#v3.4.1"
   }
 }
