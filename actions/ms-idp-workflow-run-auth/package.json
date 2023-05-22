@@ -32,9 +32,9 @@
     "@actions/exec": "^1.1.1",
     "@actions/http-client": "^2.1.0",
     "@azure/msal-node": "^1.17.2",
-    "@thnetii/gh-actions-core-helpers": "file:../gh-actions-core-helpers",
-    "@thnetii/gh-actions-http-client": "file:../../lib/gh-actions-http-client",
-    "@thnetii/gh-actions-msal-client": "file:../../lib/gh-actions-msal-client"
+    "@thnetii/gh-actions-core-helpers": "*",
+    "@thnetii/gh-actions-http-client": "*",
+    "@thnetii/gh-actions-msal-client": "*"
   },
   "devDependencies": {
     "@microsoft/microsoft-graph-types": "^2.32.0"
