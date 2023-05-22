@@ -10,7 +10,9 @@ module.exports = async (actionPath) => {
   const { name } = actionRequire(actionPackageJsonPath);
   const repoRootPath = path.resolve(path.join(__dirname, '..', '..'));
   console.log(`Executing npm to install dependencies.`);
-  execSync(`npm install --workspace "${name}" --omit=dev`, {
+  const command = `npm install --workspace "${name}" --omit=dev`;
+  console.log(`[command]${command}`);
+  execSync(command, {
     cwd: repoRootPath,
     stdio: [process.stdin, process.stdout, process.stderr],
   });
