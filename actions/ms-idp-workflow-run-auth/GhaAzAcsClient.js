@@ -35,7 +35,7 @@ class GhaAzAcsClient {
     const url = `${instance}/metadata/json/1?realm=${encodeURIComponent(
       realm
     )}`;
-    /** @type {import('@actions/http-client/lib/interfaces').TypedResponse<AzAcsMetadataDocument>} */
+    /** @type {import('@actions/http-client/lib/interfaces').TypedResponse<import('./GhaAzAcsClient.types').AzAcsMetadataDocument>} */
     const resp = await httpClient.getJson(url);
     const { result, statusCode } = resp;
     if (!result)
@@ -55,11 +55,14 @@ class GhaAzAcsClient {
     return result;
   }
 
+  /**
+   * @param {string} resource
+   */
   async acquireTokenByClientCredential(resource) {
     const httpClient = this[httpClientSym];
 
     let { tokenEndpoint } = this;
-    for (let attempt = 0; attempt < 60; attempt += 1) {
+    for (let attempt = 0; !tokenEndpoint && attempt < 60; attempt += 1) {
       // eslint-disable-next-line no-await-in-loop
       await this.updateMetadata();
       tokenEndpoint = this.tokenEndpoint;
@@ -70,6 +73,8 @@ class GhaAzAcsClient {
         });
       } else break;
     }
+    if (!tokenEndpoint)
+      throw new Error('Unable to get ACS OAuth2 Token endpoint');
 
     const { [realmSym]: realm, [clientSecretSym]: clientSecret } = this;
     let clientId = this[clientIdSym];
