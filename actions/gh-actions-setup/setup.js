@@ -28,9 +28,7 @@ module.exports = (actionPath) => {
       if (dependencyError instanceof Error) {
         console.log(`: failed`);
       }
-      console.log(
-        'At least one unfulfilled dependency detected.'
-      );
+      console.log('At least one unfulfilled dependency detected.');
       unfulfilledDependencies = true;
       break;
     }
