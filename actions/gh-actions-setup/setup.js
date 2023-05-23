@@ -9,10 +9,10 @@ const { createRequire } = require('node:module');
 module.exports = (actionPath) => {
   const repoRootPath = path.resolve(path.join(__dirname, '..', '..'));
   const actionPackagePath = path.join(actionPath, 'package.json');
-  const repoRootRequire = createRequire(repoRootPath);
+  const actionRequire = createRequire(actionPath);
   /** @type {{name: string; dependencies?: Record<string, string>}} */
   const { name: actionPackageName, dependencies } =
-    repoRootRequire(actionPackagePath);
+    actionRequire(actionPackagePath);
   console.log(
     `Checking for unfulfilled dependencies of package: ${actionPackageName}`
   );
@@ -22,7 +22,7 @@ module.exports = (actionPath) => {
   )) {
     try {
       process.stdout.write(`- ${dependencyName}`);
-      repoRootRequire(dependencyName);
+      actionRequire(dependencyName);
       console.log(': fulfilled');
     } catch (dependencyError) {
       if (dependencyError instanceof Error) {
@@ -39,7 +39,7 @@ module.exports = (actionPath) => {
     console.log(`All dependencies are installed. Setup complete.`);
     return;
   }
-  const npmCommand = `npm clean-install --workspaces --omit=dev --no-audit --no-fund`;
+  const npmCommand = `npm clean-install --workspaces --omit=dev --omit=peer --omit=optional --no-audit --no-fund`;
   console.log(`[command]${npmCommand}`);
   execSync(npmCommand, {
     cwd: repoRootPath,
