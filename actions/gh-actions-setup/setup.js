@@ -32,7 +32,7 @@ module.exports = (actionPath) => {
     return;
   }
   console.log('At least one unfulfilled dependency detected. Installing...');
-  const npmCommand = `npm clean-install --omit=dev --no-audit --no-fund`;
+  const npmCommand = `npm clean-install --workspaces --omit=dev --no-audit --no-fund`;
   console.log(`[command]${npmCommand}`);
   execSync(npmCommand, {
     cwd: repoRootPath,
