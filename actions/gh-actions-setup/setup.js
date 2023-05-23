@@ -3,41 +3,40 @@
 
 const { execSync } = require('node:child_process');
 const path = require('node:path');
-const fs = require('node:fs/promises');
 const { createRequire } = require('node:module');
 
 /** @param {string} actionPath */
-module.exports = async (actionPath) => {
+module.exports = (actionPath) => {
   const repoRootPath = path.resolve(path.join(__dirname, '..', '..'));
-  const repoRootRequire = createRequire(repoRootPath);
-  const repoRootPackageJson = path.join(repoRootPath, 'package.json');
-  const { dependencies = {}, devDependencies = {} } =
-    repoRootRequire(repoRootPackageJson);
-  for (const [depPackageName, depPackageVersion] of Object.entries({
-    ...dependencies,
-    ...devDependencies,
-  }).filter(([, v]) => typeof v === 'string' && v.startsWith('file:'))) {
-    const depPackageRelPath = /** @type {string} */ (depPackageVersion)
-      .substring(5)
-      .trim();
-    const depPackagePath = path.join(repoRootPath, depPackageRelPath);
-    const depPackageJsonPath = path.join(depPackagePath, 'package.json');
+  const actionPackagePath = path.join(actionPath, 'package.json');
+  const actionRequire = createRequire(actionPath);
+  /** @type {{name: string; dependencies?: Record<string, string>}} */
+  const { name: actionPackageName, dependencies } =
+    actionRequire(actionPackagePath);
+  console.log(
+    `Checking for unfulfilled dependencies of package: ${actionPackageName}`
+  );
+  let unfulfilledDependencies = false;
+  for (const dependencyName of Object.keys(
+    typeof dependencies === 'object' ? dependencies : {}
+  )) {
     try {
-      await fs.access(depPackageJsonPath, fs.constants.R_OK);
-    } catch {
-      await fs.mkdir(depPackagePath, { recursive: true });
-      const depPackageJson = JSON.stringify({
-        name: depPackageName,
-        version: '0.0.0',
-      });
-      await fs.writeFile(depPackageJsonPath, depPackageJson, 'utf-8');
+      actionRequire(dependencyName);
+    } catch (dependencyError) {
+      unfulfilledDependencies = true;
+      break;
     }
   }
-  const workspacePath = path.relative(repoRootPath, actionPath);
-  const npmCommand = `npm install --workspace "${workspacePath}" --no-audit --no-fund --install-links`;
+  if (!unfulfilledDependencies) {
+    console.log(`All dependencies are installed. Setup complete.`);
+    return;
+  }
+  console.log('At least one unfulfilled dependency detected. Installing...');
+  const npmCommand = `npm clean-install --omit=dev --no-audit --no-fund`;
   console.log(`[command]${npmCommand}`);
   execSync(npmCommand, {
     cwd: repoRootPath,
     stdio: [process.stdin, process.stdout, process.stderr],
   });
+  console.log('Setup complete');
 };
