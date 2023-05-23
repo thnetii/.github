@@ -8,22 +8,29 @@ const { GhaMsalAccessTokenProvider } = require('./GhaMsalAccessTokenProvider');
 const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater');
 
 function getState() {
-  const keyId = ghaHelpers.getState('key-credential-id');
+  const keyCredentialId = ghaHelpers.getState('key-credential-id');
+  const passwordCredentialId = ghaHelpers.getState('password-credential-id');
   return {
-    keyId,
+    keyCredentialId,
+    passwordCredentialId,
     ...getActionInputs(),
   };
 }
 
 async function cleanup() {
-  const { clientId, tenantId, instance, idTokenAudience, keyId } = getState();
-  if (!keyId) {
+  const {
+    clientId,
+    tenantId,
+    instance,
+    idTokenAudience,
+    keyCredentialId,
+    passwordCredentialId,
+  } = getState();
+  if (!keyCredentialId && !passwordCredentialId) {
     ghaCore.info('No temporary keyCredential registered for cleanup.');
+    ghaCore.info('No temporary passwordCredential registered for cleanup.');
     return;
   }
-  ghaCore.info(
-    `Detected keyCredential previously registered for cleanup. keyId: ${keyId}`
-  );
 
   const idToken = await getGithubActionsToken(idTokenAudience);
   const msalHttpClient = new GhaHttpClient();
@@ -37,7 +44,20 @@ async function cleanup() {
     );
     const msgraphClient = new GhaServicePrincipalUpdater(msalApp, clientId);
     try {
-      await msgraphClient.removeKeyCredentialByKeyId(keyId);
+      if (keyCredentialId) {
+        ghaCore.info(
+          `Detected keyCredential previously registered for cleanup. keyId: ${keyCredentialId}`
+        );
+        await msgraphClient.removeKeyCredentialByKeyId(keyCredentialId);
+      }
+      if (passwordCredentialId) {
+        ghaCore.info(
+          `Detected passwordCredential previously registered for cleanup. keyId: ${passwordCredentialId}`
+        );
+        await msgraphClient.removePasswordCredentialByKeyId(
+          passwordCredentialId
+        );
+      }
     } finally {
       await msgraphClient.dispose();
     }

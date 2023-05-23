@@ -60,10 +60,10 @@ class GhaServicePrincipalUpdater {
    * @param {string} keyId
    */
   async removeKeyCredentialByKeyId(keyId) {
+    const httpClient = await this[httpClientSym];
     ghaCore.info(
       'Removing certificate from Microsoft Graph service principal entity'
     );
-    const httpClient = await this[httpClientSym];
     const { result: spnEntity } = await this.getKeyCredentials();
     let { keyCredentials } = spnEntity;
     if (!Array.isArray(keyCredentials)) keyCredentials = [];
@@ -92,10 +92,10 @@ class GhaServicePrincipalUpdater {
    * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider')['generateCertificate']>>} keyPair
    */
   async addCertificateKeyCredential(keyPair) {
+    const httpClient = await this[httpClientSym];
     ghaCore.info(
       'Adding certificate to Microsoft Graph service principal entity'
     );
-    const httpClient = await this[httpClientSym];
     const { result: spnEntity } = await this.getKeyCredentials();
     let { keyCredentials } = spnEntity;
     if (!Array.isArray(keyCredentials)) keyCredentials = [];
@@ -143,6 +143,42 @@ class GhaServicePrincipalUpdater {
       `Certificate added to service principal entity. keyId: ${keyCredential.keyId}`
     );
     return keyCredential;
+  }
+
+  /**
+   * @param {string} keyId
+   */
+  async removePasswordCredentialByKeyId(keyId) {
+    const httpClient = await this[httpClientSym];
+    ghaCore.info(
+      'Removing password credential from Microsoft Graph service principal entity'
+    );
+    const url = `${this[spnUrlSym]}/removePassword`;
+    await httpClient.postJson(url, { keyId });
+  }
+
+  /**
+   * @param {Pick<import('@microsoft/microsoft-graph-types').PasswordCredential, 'displayName' | 'startDateTime' | 'endDateTime' | 'customKeyIdentifier'>} [passwordCredential]
+   */
+  async addPasswordCredential(passwordCredential) {
+    const httpClient = await this[httpClientSym];
+    ghaCore.info(
+      'Adding password credential to Microsoft Graph service principal entity'
+    );
+    const url = `${this[spnUrlSym]}/addPassword`;
+    const request = {
+      passwordCredential:
+        typeof passwordCredential === 'object' ? passwordCredential : {},
+    };
+    /** @type {import('@actions/http-client/lib/interfaces').TypedResponse<Required<import('@microsoft/microsoft-graph-types').PasswordCredential>>} */
+    const response = await httpClient.postJson(url, request);
+    const { statusCode, result } = response;
+    if (!result)
+      throw new HttpClientError(
+        'Password credential result is null',
+        statusCode
+      );
+    return result;
   }
 
   async dispose() {

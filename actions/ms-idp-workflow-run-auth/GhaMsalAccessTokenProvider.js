@@ -16,7 +16,7 @@ class GhaMsalAccessTokenProvider {
   /**
    * @param {import('@actions/http-client').HttpClient} httpClient
    * @param {string} clientId
-   * @param {string | Exclude<import('@azure/msal-node').Configuration['auth']['clientCertificate'], undefined>} assertionInfo
+   * @param {string | Exclude<import('@azure/msal-node').Configuration['auth']['clientCertificate'], undefined> | { clientSecret: string }} assertionInfo
    * @param {string} tenantId
    * @param {AzureCloudInstance | undefined} [instance]
    */
@@ -35,7 +35,9 @@ class GhaMsalAccessTokenProvider {
     };
     if (typeof assertionInfo === 'string')
       config.auth.clientAssertion = assertionInfo;
-    else if (assertionInfo?.privateKey && assertionInfo?.thumbprint)
+    else if ('clientSecret' in assertionInfo) {
+      config.auth.clientSecret = assertionInfo.clientSecret;
+    } else if (assertionInfo?.privateKey && assertionInfo?.thumbprint)
       config.auth.clientCertificate = assertionInfo;
     this.msalApp = new ConfidentialClientApplication(
       buildAppConfiguration(config)

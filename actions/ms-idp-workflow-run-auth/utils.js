@@ -1,10 +1,7 @@
 const ghaCore = require('@actions/core');
 const { AzureCloudInstance } = require('@azure/msal-node');
 
-const {
-  getInput,
-  getBooleanInput,
-} = require('@thnetii/gh-actions-core-helpers');
+const { getInput } = require('@thnetii/gh-actions-core-helpers');
 
 module.exports = {
   getActionInputs() {
@@ -30,18 +27,20 @@ module.exports = {
         required: false,
         trimWhitespace: true,
       }) || undefined;
-    const useClientCertificate =
-      getBooleanInput('use-client-certificate', {
-        required: false,
-        trimWhitespace: true,
-      }) || false;
+    const authMethod =
+      /** @type {import('./types').GhaActionAuthMethod} */ (
+        getInput('auth-method', {
+          required: false,
+          trimWhitespace: true,
+        })
+      ) || 'ms-idp-federated-credential';
     return {
       clientId,
       tenantId,
       instance,
       resource,
       idTokenAudience,
-      useClientCertificate,
+      authMethod,
     };
   },
 
