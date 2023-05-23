@@ -40,4 +40,30 @@ jobs:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
           resource: ${{ inputs.resource }}
-          use-client-certificate: 'true'
+          auth-method: 'ms-idp-temporary-certificate'
+  msal-tmp-secret:
+    name: Acquire Azure AD Access Token (using temporary secret)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Github Actions for Node.js
+        uses: actions/setup-node@v3
+      - name: Authenticate using GitHub action
+        uses: thnetii/.github/actions/ms-idp-workflow-run-auth@main
+        with:
+          tenant-id: ${{ inputs.tenant-id }}
+          client-id: ${{ inputs.client-id }}
+          resource: ${{ inputs.resource }}
+          auth-method: 'ms-idp-temporary-secret'
+  acs-tmp-secret:
+    name: Acquire Azure AD Access Token (using ACS with temporary secret)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Github Actions for Node.js
+        uses: actions/setup-node@v3
+      - name: Authenticate using GitHub action
+        uses: thnetii/.github/actions/ms-idp-workflow-run-auth@main
+        with:
+          tenant-id: ${{ inputs.tenant-id }}
+          client-id: ${{ inputs.client-id }}
+          resource: ${{ inputs.resource }}
+          auth-method: 'az-acs-temporary-secret'
