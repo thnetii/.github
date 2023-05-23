@@ -34,7 +34,7 @@ module.exports = async (actionPath) => {
     }
   }
   const workspacePath = path.relative(repoRootPath, actionPath);
-  const npmCommand = `npm install --workspace "${workspacePath}" --omit=dev --no-audit --no-fund --install-links`;
+  const npmCommand = `npm install --workspace "${workspacePath}" --no-audit --no-fund --install-links`;
   console.log(`[command]${npmCommand}`);
   execSync(npmCommand, {
     cwd: repoRootPath,
