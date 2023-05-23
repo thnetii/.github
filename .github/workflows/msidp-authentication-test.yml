@@ -11,6 +11,8 @@ on:
         required: true
       resource:
         type: string
+      resource-hostname:
+        type: string
 
 permissions:
   id-token: write
@@ -65,5 +67,5 @@ jobs:
         with:
           tenant-id: ${{ inputs.tenant-id }}
           client-id: ${{ inputs.client-id }}
-          resource: ${{ inputs.resource }}
+          resource: ${{ inputs.resource }}/${{ inputs.resource-hostname }}
           auth-method: 'az-acs-temporary-secret'
