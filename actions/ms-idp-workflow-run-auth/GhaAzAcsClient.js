@@ -87,7 +87,7 @@ class GhaAzAcsClient {
 
     ghaCore.info(`Acquiring ACS access token for resource: ${resource}`);
     const payload = new URLSearchParams({
-      grant_type: 'client_ceredentials',
+      grant_type: 'client_credentials',
       client_id: clientId,
       client_secret: clientSecret,
       resource,
