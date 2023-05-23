@@ -1,4 +1,5 @@
 const ghaCore = require('@actions/core');
+const { HttpClientError } = require('@actions/http-client');
 const { AuthError } = require('@azure/msal-node');
 
 const { saveState } = require('@thnetii/gh-actions-core-helpers');
@@ -78,7 +79,7 @@ async function acquireAccessTokenAzAcs(acsClient, resource, maxAttempts) {
       // eslint-disable-next-line no-await-in-loop
       result = await acsClient.acquireTokenByClientCredential(resource);
     } catch (err) {
-      if (err instanceof AuthError) {
+      if (err instanceof HttpClientError) {
         error = err;
         // eslint-disable-next-line no-continue
         continue;
