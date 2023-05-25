@@ -1,0 +1,19 @@
+name: '@thnetii/gh-actions-ratelimit-check'
+author: thnetii
+description: ''
+runs:
+  using: composite
+  steps:
+    - id: ratelimit-check
+      uses: actions/github-script@v6.4.1
+      with:
+        script: |
+          require(process.env['GITHUB_ACTION_PATH'])(
+            {
+              github, core,
+              inputs: JSON.parse(process.env['ACTION_INPUTS_JSON']),
+            }
+          );
+      env:
+        ACTION_INPUTS_JSON: ${{ toJson(inputs) }}
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
