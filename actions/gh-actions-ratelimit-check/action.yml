@@ -1,6 +1,21 @@
 name: '@thnetii/gh-actions-ratelimit-check'
 author: thnetii
-description: ''
+description: |
+  GitHub actions that checks the remaining rate-limit for the GitHub API.
+  By default, the action will wait until the next rate-limit windows reset if
+  the remaining limit is below a threshold.
+inputs:
+  remaining-threshold:
+    default: '15'
+    description: >
+      The minimum remaining threshold that must be available.
+  below-threshold-action:
+    default: wait
+    description: >
+      The action to perform when the remaining threshold is below the minimum.
+      - wait: Wait until the rate-limit window reset.
+      - warning: Emit a warning and immediately exit (but exit with success).
+      - failure: Emit an error and immediately exit the action with the outcome set to 'failed'.
 runs:
   using: composite
   steps:
