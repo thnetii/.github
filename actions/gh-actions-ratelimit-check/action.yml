@@ -1,21 +1,8 @@
 name: '@thnetii/gh-actions-ratelimit-check'
 author: thnetii
 description: |
-  GitHub actions that checks the remaining rate-limit for the GitHub API.
-  By default, the action will wait until the next rate-limit windows reset if
-  the remaining limit is below a threshold.
-inputs:
-  remaining-threshold:
-    default: '15'
-    description: >
-      The minimum remaining threshold that must be available.
-  below-threshold-action:
-    default: wait
-    description: >
-      The action to perform when the remaining threshold is below the minimum.
-      - wait: Wait until the rate-limit window reset.
-      - warning: Emit a warning and immediately exit (but exit with success).
-      - failure: Emit an error and immediately exit the action with the outcome set to 'failed'.
+  GitHub actions that checks the remaining rate-limit for the core GitHub API.
+inputs: {}
 runs:
   using: composite
   steps:
@@ -26,9 +13,24 @@ runs:
           require(process.env['GITHUB_ACTION_PATH'])(
             {
               github, core,
-              inputs: JSON.parse(process.env['ACTION_INPUTS_JSON']),
             }
           );
       env:
-        ACTION_INPUTS_JSON: ${{ toJson(inputs) }}
         GITHUB_ACTION_PATH: ${{ github.action_path }}
+outputs:
+  remaining:
+    description: |
+      The number of requests remaining in the current rate limit window.
+    value: ${{ steps.ratelimit-check.outputs.remaining }}
+  reset:
+    description: |
+      The time at which the current rate limit window resets as an ISO 8601 date-time string
+    value: ${{ steps.ratelimit-check.outputs.reset }}
+  limit:
+    description: |
+      The maximum number of requests you're permitted to make per hour.
+    value: ${{ steps.ratelimit-check.outputs.limit }}
+  used:
+    description: |
+      The number of requests you've made in the current rate limit window.
+    value: ${{ steps.ratelimit-check.outputs.used }}
