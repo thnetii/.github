@@ -1,0 +1,35 @@
+{
+  "name": "@thnetii/gh-actions-dotnet-info",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thnetii/.github.git",
+    "directory": "actions/gh-actions-dotnet-info"
+  },
+  "keywords": [
+    "ghactions",
+    "gh-actions",
+    "github-actions",
+    "dotnet"
+  ],
+  "author": {
+    "name": "TH-NETII Rasch Solutions",
+    "email": "fredrik.rasch@gmail.com",
+    "url": "https://thnetii.td.org.uit.no"
+  },
+  "maintainers": [
+    "Fredrik Høisæther Rasch <fredrik.rasch@gmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/thnetii/.github/issues"
+  },
+  "homepage": "https://github.com/thnetii/.github#readme",
+  "license": "MIT",
+  "files": [
+    "action.yml"
+  ],
+  "main": "action.js",
+  "devDependencies": {
+    "github-script": "github:actions/github-script#v6.4.1"
+  }
+}
