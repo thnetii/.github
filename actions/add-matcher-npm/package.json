@@ -33,9 +33,6 @@
     "npm.json"
   ],
   "main": "action.js",
-  "peerDependencies": {
-    "npm": ">=5"
-  },
   "dependencies": {
     "@actions/core": "^1.10.0"
   },
