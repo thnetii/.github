@@ -39,7 +39,7 @@
     "setup-node": "github:actions/setup-node#v3.6.0"
   },
   "devDependencies": {
-    "@types/eslint": "^8.40.2"
+    "@types/eslint": "^8"
   },
   "peerDependencies": {
     "eslint": ">=7"
