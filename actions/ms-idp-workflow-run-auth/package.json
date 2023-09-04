@@ -31,7 +31,7 @@
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
     "@actions/http-client": "^2.1.1",
-    "@azure/msal-node": "^1.18.1",
+    "@azure/msal-node": "^2.0.2",
     "@thnetii/gh-actions-core-helpers": "*",
     "@thnetii/gh-actions-http-client": "*",
     "@thnetii/gh-actions-msal-client": "*"
