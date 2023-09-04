@@ -55,7 +55,7 @@ outputs:
       The object is an instance of the `AuthenticationResult` described by the
       `@azure/msal-common` npm package.
 runs:
-  using: node16
+  using: node20
   pre: setup.js
   main: action.js
   post: cleanup.js

@@ -35,6 +35,6 @@ outputs:
   prettier-exitcode:
     description: ''
 runs:
-  using: node16
+  using: node20
   pre: setup.js
   main: action.js

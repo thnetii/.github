@@ -20,7 +20,7 @@
   "homepage": "https://github.com/thnetii/.github#readme",
   "license": "MIT",
   "engines": {
-    "node": ">= 16"
+    "node": ">=20"
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
