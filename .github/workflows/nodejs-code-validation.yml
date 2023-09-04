@@ -11,7 +11,7 @@ on:
           GitHub action.
       setup-node-parameters:
         type: string
-        default: '{}'
+        default: '{"node-version": "20.x"}'
         description: >
           A JSON object string specifying the inputs for the actions/setup-node
           GitHub action.
