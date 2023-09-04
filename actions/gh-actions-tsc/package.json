@@ -34,5 +34,8 @@
     "@actions/exec": "^1.1.1",
     "@thnetii/gh-actions-core-helpers": "*",
     "setup-node": "github:actions/setup-node#v3.6.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

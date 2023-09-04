@@ -33,5 +33,8 @@
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
     "@thnetii/gh-actions-core-helpers": "*"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

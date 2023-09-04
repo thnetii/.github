@@ -2,6 +2,6 @@ name: '@thnetii/gh-actions-add-matcher-npm'
 author: thnetii
 description: Adds a GitHub actions matcher for error and warning messages emitted by NPM
 runs:
-  using: node16
+  using: node20
   pre: setup.js
   main: action.js

@@ -19,7 +19,7 @@ inputs:
     description: 'The working directory in which to configure the user details.'
     required: false
 runs:
-  using: node16
+  using: node20
   pre: setup.js
   main: action.js
   post: unset.js

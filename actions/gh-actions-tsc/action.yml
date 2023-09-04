@@ -31,6 +31,6 @@ inputs:
     default: 'false'
     required: false
 runs:
-  using: node16
+  using: node20
   pre: setup.js
   main: action.js

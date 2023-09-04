@@ -31,5 +31,8 @@
   "main": "action.js",
   "devDependencies": {
     "github-script": "github:actions/github-script#v6.4.1"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

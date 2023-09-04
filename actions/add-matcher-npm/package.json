@@ -37,6 +37,9 @@
     "@actions/core": "^1.10.0"
   },
   "devDependencies": {
-    "@types/node": "^16"
+    "@types/node": "^20"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
