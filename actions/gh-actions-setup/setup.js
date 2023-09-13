@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 
-const { execSync } = require('node:child_process');
+const { fork } = require('node:child_process');
 const path = require('node:path');
 const { createRequire } = require('node:module');
 
@@ -37,12 +37,27 @@ module.exports = (actionPath) => {
     console.log(`All dependencies are installed. Setup complete.`);
     return;
   }
-  const npmPath = path.normalize(path.join(process.execPath, '..', 'npm'));
-  const npmCommand = `"${npmPath}" clean-install --workspaces --omit=dev --omit=peer --omit=optional --no-audit --no-fund`;
-  console.log(`[command]${npmCommand}`);
-  execSync(npmCommand, {
-    cwd: repoRootPath,
-    stdio: [process.stdin, process.stdout, process.stderr],
+  // eslint-disable-next-line node/no-extraneous-require
+  const npmPath = require.resolve('npm', {
+    paths: [path.dirname(process.execPath)],
   });
-  console.log('Setup complete');
+  console.log(`npm module located at: ${npmPath}`);
+  const npmArgs = [
+    'clean-install',
+    '--workspaces',
+    '--omit=dev',
+    '--omit=peer',
+    '--omit=optional',
+    '--no-audit',
+    '--no-fund',
+  ];
+  const npmCommand = `npm ${npmArgs.join(' ')}`;
+  console.log(`[command]${npmCommand}`);
+  const npmFork = fork(npmPath, npmArgs, {
+    cwd: repoRootPath,
+  });
+  npmFork.on('exit', (exitCode) => {
+    console.log(`npm exited with exit code: ${exitCode}`);
+    if (exitCode === 0) console.log('Setup complete');
+  });
 };
