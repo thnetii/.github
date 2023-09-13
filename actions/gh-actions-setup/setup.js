@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 
+const os = require('node:os');
 const { execSync, fork } = require('node:child_process');
 const path = require('node:path');
 const { createRequire } = require('node:module');
@@ -9,6 +10,7 @@ const { createRequire } = require('node:module');
 module.exports = (actionPath) => {
   const repoRootPath = path.resolve(path.join(__dirname, '..', '..'));
   const repoTmpPath = path.join(repoRootPath, 'tmp');
+  const repoTmpLibPath = path.join(repoTmpPath, 'lib');
   const actionPackagePath = path.join(actionPath, 'package.json');
   const actionRequire = createRequire(actionPath);
   /** @type {{name: string; dependencies?: Record<string, string>}} */
@@ -45,13 +47,9 @@ module.exports = (actionPath) => {
     cwd: __dirname,
     stdio: [process.stdin, process.stdout, process.stderr],
   });
-  execSync(`ls -lah`, {
-    cwd: repoTmpPath,
-    stdio: [process.stdin, process.stdout, process.stderr],
-  });
 
   // eslint-disable-next-line node/no-missing-require
-  const npmPath = require.resolve('npm', { paths: [repoTmpPath] });
+  const npmPath = require.resolve('npm', { paths: [repoTmpLibPath, repoTmpPath] });
   console.log(`npm module located at: ${npmPath}`);
   const npmArgs = [
     'clean-install',
