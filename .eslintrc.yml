@@ -1,7 +1,4 @@
 root: true
-env:
-  es2020: true
-  node: true
 parser: '@babel/eslint-parser'
 parserOptions:
   requireConfigFile: false
@@ -11,3 +8,7 @@ parserOptions:
     presets: ['@babel/preset-env']
 extends:
   - '@thnetii/node-base'
+rules:
+  node/no-unsupported-features/es-syntax:
+    - error
+    - ignores: ['modules']

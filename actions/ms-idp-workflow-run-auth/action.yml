@@ -57,5 +57,5 @@ outputs:
 runs:
   using: node20
   pre: setup.js
-  main: action.js
+  main: action.mjs
   post: cleanup.js

@@ -1,8 +1,8 @@
-const ghaCore = require('@actions/core');
-const { HttpClientError, HttpCodes } = require('@actions/http-client');
-const { AzureCloudInstance } = require('@azure/msal-node');
+import { info } from '@actions/core';
+import { HttpClientError, HttpCodes } from '@actions/http-client';
+import { AzureCloudInstance } from '@azure/msal-node';
 
-const { onJwtToken } = require('./utils.js');
+import { onJwtToken } from './utils.mjs';
 
 const httpClientSym = Symbol('#httpClient');
 const clientIdSym = Symbol('#clientId');
@@ -35,7 +35,7 @@ class GhaAzAcsClient {
     const url = `${instance}/metadata/json/1?realm=${encodeURIComponent(
       realm,
     )}`;
-    /** @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<import('./GhaAzAcsClient.types.d.ts').AzAcsMetadataDocument>} */
+    /** @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<import('./GhaAzAcsClient.types.js').AzAcsMetadataDocument>} */
     const resp = await httpClient.getJson(url);
     const { result, statusCode } = resp;
     if (!result)
@@ -85,7 +85,7 @@ class GhaAzAcsClient {
       resource += suffix;
     }
 
-    ghaCore.info(`Acquiring ACS access token for resource: ${resource}`);
+    info(`Acquiring ACS access token for resource: ${resource}`);
     const payload = new URLSearchParams({
       grant_type: 'client_credentials',
       client_id: clientId,
@@ -100,7 +100,7 @@ class GhaAzAcsClient {
     } = resp;
     const body = await resp.readBody();
     /**
-     * @type {import('./GhaAzAcsClient.types.d.ts').AzAcsOAuthEndpointHttpResponse}
+     * @type {import('./GhaAzAcsClient.types.js').AzAcsOAuthEndpointHttpResponse}
      */
     const typedResponse = {
       statusCode: statusCode || HttpCodes.InternalServerError,
@@ -108,7 +108,7 @@ class GhaAzAcsClient {
       result: JSON.parse(body),
     };
     if (typedResponse.statusCode === HttpCodes.OK) {
-      ghaCore.info('Successfully acquired ACS access token.');
+      info('Successfully acquired ACS access token.');
       const {
         result: { access_token: token },
       } = typedResponse;
@@ -123,6 +123,6 @@ class GhaAzAcsClient {
   }
 }
 
-module.exports = {
+export default {
   GhaAzAcsClient,
 };

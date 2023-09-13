@@ -31,4 +31,8 @@ jobs:
           "arguments": "--noEmit\n-p\n./jsconfig.json"
         }
       eslint-check-enable: true
+      eslint-parameters: >
+        {
+          "npm-workspaces": true
+        }
       prettier-check-enable: true

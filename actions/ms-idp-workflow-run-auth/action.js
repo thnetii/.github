@@ -1,26 +1,23 @@
 const ghaCore = require('@actions/core');
 const { HttpClientError } = require('@actions/http-client');
-const { AuthError } = require('@azure/msal-node');
+const msalNodeModule = import('@azure/msal-node');
 
 const { saveState } = require('@thnetii/gh-actions-core-helpers');
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
-const { getActionInputs, getGithubActionsToken } = require('./utils.js');
-const { GhaAzAcsClient } = require('./GhaAzAcsClient.js');
-const {
-  GhaMsalAccessTokenProvider,
-} = require('./GhaMsalAccessTokenProvider.js');
+const utilsModule = import('./utils.mjs');
+const GhaAzAcsClientModule = import('./GhaAzAcsClient.mjs');
+const GhaMsalAccessTokenProviderModule = import('./GhaMsalAccessTokenProvider.mjs');
 const { generateCertificate } = require('./GhaOpenSslCertProvider.js');
-const {
-  GhaServicePrincipalUpdater,
-} = require('./GhaServicePrincipalUpdater.js');
+const GhaServicePrincipalUpdaterModule = import('./GhaServicePrincipalUpdater.mjs');
 
 /**
- * @param {GhaMsalAccessTokenProvider} msalApp
+ * @param {InstanceType<Awaited<GhaMsalAccessTokenProviderModule>['default']['GhaMsalAccessTokenProvider']>} msalApp
  * @param {string} resource
  * @param {number} maxAttempts
  */
 async function acquireAccessTokenMsal(msalApp, resource, maxAttempts) {
+  const { AuthError } = await msalNodeModule;
   let error;
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     let result;
@@ -61,7 +58,7 @@ async function acquireAccessTokenMsal(msalApp, resource, maxAttempts) {
 }
 
 /**
- * @param {GhaAzAcsClient} acsClient
+ * @param {InstanceType<Awaited<GhaAzAcsClientModule>['default']['GhaAzAcsClient']>} acsClient
  * @param {string} resource
  * @param {number} maxAttempts
  */
@@ -91,7 +88,8 @@ async function acquireAccessTokenAzAcs(acsClient, resource, maxAttempts) {
       throw err;
     }
     if (!result) {
-      error = new AuthError(undefined, 'No Authentication result received');
+  const { AuthError } = await msalNodeModule;
+  error = new AuthError(undefined, 'No Authentication result received');
       // eslint-disable-next-line no-continue
       continue;
     }
@@ -114,6 +112,8 @@ async function acquireAccessTokenAzAcs(acsClient, resource, maxAttempts) {
  * @param {import('@actions/http-client').HttpClient} httpClient
  */
 async function acquireAccessToken(httpClient) {
+  const { getActionInputs, getGithubActionsToken } = await utilsModule;
+  const { default: { GhaMsalAccessTokenProvider } } = await GhaMsalAccessTokenProviderModule;
   let maxAttempts = 1;
   const {
     clientId,
@@ -132,6 +132,7 @@ async function acquireAccessToken(httpClient) {
     instance,
   );
 
+  const { default: { GhaServicePrincipalUpdater } } = await GhaServicePrincipalUpdaterModule;
   if (authMethod === 'ms-idp-temporary-certificate') {
     maxAttempts = 60;
     const keyPair = await generateCertificate();
@@ -198,6 +199,7 @@ async function acquireAccessToken(httpClient) {
       ghaCore.debug(
         'Creating Azure Access Control Service client using the temporary password credential for client authentication',
       );
+      const { default: { GhaAzAcsClient } } = await GhaAzAcsClientModule;
       const acsClient = new GhaAzAcsClient(
         httpClient,
         clientId,
