@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 
-const { fork } = require('node:child_process');
+const { execSync, fork } = require('node:child_process');
 const path = require('node:path');
 const { createRequire } = require('node:module');
 
 /** @param {string} actionPath */
 module.exports = (actionPath) => {
   const repoRootPath = path.resolve(path.join(__dirname, '..', '..'));
+  const repoTmpPath = path.resolve(path.join(repoRootPath, 'tmp'));
   const actionPackagePath = path.join(actionPath, 'package.json');
   const actionRequire = createRequire(actionPath);
   /** @type {{name: string; dependencies?: Record<string, string>}} */
@@ -37,10 +38,16 @@ module.exports = (actionPath) => {
     console.log(`All dependencies are installed. Setup complete.`);
     return;
   }
-  // eslint-disable-next-line node/no-extraneous-require
-  const npmPath = require.resolve('npm', {
-    paths: [path.dirname(process.execPath)],
+
+  let npmCommand = `npm --prefix "${repoTmpPath}" install --global npm --no-audit --no-fund`;
+  console.log(`[command]${npmCommand}`);
+  execSync(npmCommand, {
+    cwd: __dirname,
+    stdio: [process.stdin, process.stdout, process.stderr],
   });
+
+  // eslint-disable-next-line node/no-missing-require
+  const npmPath = require.resolve('npm', { paths: [repoTmpPath] });
   console.log(`npm module located at: ${npmPath}`);
   const npmArgs = [
     'clean-install',
@@ -51,7 +58,7 @@ module.exports = (actionPath) => {
     '--no-audit',
     '--no-fund',
   ];
-  const npmCommand = `npm ${npmArgs.join(' ')}`;
+  npmCommand = `npm ${npmArgs.join(' ')}`;
   console.log(`[command]${npmCommand}`);
   const npmFork = fork(npmPath, npmArgs, {
     cwd: repoRootPath,
