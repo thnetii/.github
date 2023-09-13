@@ -19,5 +19,5 @@ exec('npm', npmExecArgs, { cwd: execCwd, ignoreReturnCode: true }).then(
   (exitCode) => {
     ghaCore.setOutput('eslint-exitcode', exitCode);
     process.exitCode = exitCode;
-  }
+  },
 );

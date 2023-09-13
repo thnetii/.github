@@ -27,7 +27,7 @@ class GhaServicePrincipalUpdater {
   constructor(msalApp, appId) {
     this[httpClientSym] = createHttpClient(
       msalApp,
-      'https://graph.microsoft.com'
+      'https://graph.microsoft.com',
     );
     this.appId = appId;
     this[
@@ -37,7 +37,7 @@ class GhaServicePrincipalUpdater {
 
   async getKeyCredentials() {
     ghaCore.debug(
-      'Retrieving all keyCredentials registered on Microsoft Graph service principal entity.'
+      'Retrieving all keyCredentials registered on Microsoft Graph service principal entity.',
     );
     const httpClient = await this[httpClientSym];
     const url = `${this[spnUrlSym]}?$select=id,appId,appDisplayName,keyCredentials`;
@@ -51,7 +51,7 @@ class GhaServicePrincipalUpdater {
     if (!result)
       throw new HttpClientError(
         'Service Principal result entity is null',
-        statusCode
+        statusCode,
       );
     return { result, headers, statusCode };
   }
@@ -62,14 +62,14 @@ class GhaServicePrincipalUpdater {
   async removeKeyCredentialByKeyId(keyId) {
     const httpClient = await this[httpClientSym];
     ghaCore.info(
-      'Removing certificate from Microsoft Graph service principal entity'
+      'Removing certificate from Microsoft Graph service principal entity',
     );
     const { result: spnEntity } = await this.getKeyCredentials();
     let { keyCredentials } = spnEntity;
     if (!Array.isArray(keyCredentials)) keyCredentials = [];
 
     ghaCore.debug(
-      `Removing keyCredential with keyId '${keyId}' from registered keyCredentials.`
+      `Removing keyCredential with keyId '${keyId}' from registered keyCredentials.`,
     );
     const keyIdx = keyCredentials.findIndex((c) => c.keyId === keyId);
     if (keyIdx < 0) return;
@@ -79,7 +79,7 @@ class GhaServicePrincipalUpdater {
     }
 
     ghaCore.debug(
-      'Updating Microsoft Graph service principal entity with modified keyCredentials list'
+      'Updating Microsoft Graph service principal entity with modified keyCredentials list',
     );
     // @ts-ignore
     // eslint-disable-next-line no-unused-vars
@@ -94,7 +94,7 @@ class GhaServicePrincipalUpdater {
   async addCertificateKeyCredential(keyPair) {
     const httpClient = await this[httpClientSym];
     ghaCore.info(
-      'Adding certificate to Microsoft Graph service principal entity'
+      'Adding certificate to Microsoft Graph service principal entity',
     );
     const { result: spnEntity } = await this.getKeyCredentials();
     let { keyCredentials } = spnEntity;
@@ -116,7 +116,7 @@ class GhaServicePrincipalUpdater {
     });
 
     ghaCore.debug(
-      'Updating Microsoft Graph service principal entity with modified keyCredentials list'
+      'Updating Microsoft Graph service principal entity with modified keyCredentials list',
     );
     /**
      * @type {import('@actions/http-client/lib/interfaces').TypedResponse<
@@ -133,14 +133,14 @@ class GhaServicePrincipalUpdater {
     }
 
     const keyCredential = keyCredentials.find(
-      (k) => k.customKeyIdentifier === thumbprint
+      (k) => k.customKeyIdentifier === thumbprint,
     );
     if (!keyCredential)
       throw new Error(
-        'Failed to update service principal with new key credential'
+        'Failed to update service principal with new key credential',
       );
     ghaCore.info(
-      `Certificate added to service principal entity. keyId: ${keyCredential.keyId}`
+      `Certificate added to service principal entity. keyId: ${keyCredential.keyId}`,
     );
     return keyCredential;
   }
@@ -151,7 +151,7 @@ class GhaServicePrincipalUpdater {
   async removePasswordCredentialByKeyId(keyId) {
     const httpClient = await this[httpClientSym];
     ghaCore.info(
-      'Removing password credential from Microsoft Graph service principal entity'
+      'Removing password credential from Microsoft Graph service principal entity',
     );
     const url = `${this[spnUrlSym]}/removePassword`;
     await httpClient.postJson(url, { keyId });
@@ -163,7 +163,7 @@ class GhaServicePrincipalUpdater {
   async addPasswordCredential(passwordCredential) {
     const httpClient = await this[httpClientSym];
     ghaCore.info(
-      'Adding password credential to Microsoft Graph service principal entity'
+      'Adding password credential to Microsoft Graph service principal entity',
     );
     const url = `${this[spnUrlSym]}/addPassword`;
     const request = {
@@ -176,7 +176,7 @@ class GhaServicePrincipalUpdater {
     if (!result)
       throw new HttpClientError(
         'Password credential result is null',
-        statusCode
+        statusCode,
       );
     return result;
   }

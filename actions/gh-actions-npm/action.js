@@ -57,7 +57,7 @@ const npmPackageNameRegex =
   /(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*/;
 const npmPackageNameRegexWithVersionAndColon = new RegExp(
   `^\\s*${npmPackageNameRegex.source}@\\S+:`,
-  'u'
+  'u',
 );
 
 exec('npm', npmArgs, {

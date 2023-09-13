@@ -17,7 +17,7 @@ if (prettierArgs?.length > 0) npmExecArgs.push(...prettierArgs);
 else npmExecArgs.push('.');
 const prettierFilePrefix = path.relative(
   githubWorkspace,
-  path.resolve(prettierCwd)
+  path.resolve(prettierCwd),
 );
 
 getExecOutput('npm', npmExecArgs, {

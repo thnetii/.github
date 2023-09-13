@@ -21,7 +21,7 @@ function escapeDNComponentValue(value) {
 }
 
 const ghaCertSubject = `/CN=GitHub Actions Workflow Run ${ghaRunId}/O=${escapeDNComponentValue(
-  ghaRepoOrg || ''
+  ghaRepoOrg || '',
 )}/OU=${escapeDNComponentValue(ghaRepo || '')}`;
 
 module.exports = {
@@ -57,7 +57,7 @@ module.exports = {
     const x509 = new crypto.X509Certificate(pubCerPem);
     const thumbprint = Buffer.from(x509.fingerprint.replaceAll(':', ''), 'hex');
     ghaCore.info(
-      `Generated certificate with thumbprint: ${thumbprint.toString('base64')}`
+      `Generated certificate with thumbprint: ${thumbprint.toString('base64')}`,
     );
     return {
       uuid,

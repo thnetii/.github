@@ -23,7 +23,7 @@ async function acquireAccessTokenMsal(msalApp, resource, maxAttempts) {
     try {
       if (attempt > 0) {
         ghaCore.info(
-          `Authentication attempt ${attempt} failed. Waiting 5 seconds for the system to propagate possibly missing credentials.`
+          `Authentication attempt ${attempt} failed. Waiting 5 seconds for the system to propagate possibly missing credentials.`,
         );
         // eslint-disable-next-line no-await-in-loop
         await new Promise((resolve) => {
@@ -69,7 +69,7 @@ async function acquireAccessTokenAzAcs(acsClient, resource, maxAttempts) {
     try {
       if (attempt > 0) {
         ghaCore.info(
-          `Authentication attempt ${attempt} failed. Waiting 5 seconds for the system to propagate possibly missing credentials.`
+          `Authentication attempt ${attempt} failed. Waiting 5 seconds for the system to propagate possibly missing credentials.`,
         );
         // eslint-disable-next-line no-await-in-loop
         await new Promise((resolve) => {
@@ -101,7 +101,7 @@ async function acquireAccessTokenAzAcs(acsClient, resource, maxAttempts) {
   }
 
   ghaCore.info(
-    `Authentication attempt ${attempt} failed. Maximum number of retries reached.`
+    `Authentication attempt ${attempt} failed. Maximum number of retries reached.`,
   );
   throw error;
 }
@@ -125,7 +125,7 @@ async function acquireAccessToken(httpClient) {
     clientId,
     idToken,
     tenantId,
-    instance
+    instance,
   );
 
   if (authMethod === 'ms-idp-temporary-certificate') {
@@ -141,7 +141,7 @@ async function acquireAccessToken(httpClient) {
     saveState('key-credential-id', keyCredential?.keyId);
 
     ghaCore.debug(
-      'Replacing MSAL application with a new application using the temporary certificate for client authentication'
+      'Replacing MSAL application with a new application using the temporary certificate for client authentication',
     );
     msalApp = new GhaMsalAccessTokenProvider(
       httpClient,
@@ -152,7 +152,7 @@ async function acquireAccessToken(httpClient) {
         // x5c: keyPair.certificate,
       },
       tenantId,
-      instance
+      instance,
     );
     return acquireAccessTokenMsal(msalApp, resource, maxAttempts);
   }
@@ -179,27 +179,27 @@ async function acquireAccessToken(httpClient) {
 
     if (authMethod === 'ms-idp-temporary-secret') {
       ghaCore.debug(
-        'Replacing MSAL application with a new application using the temporary password credential for client authentication'
+        'Replacing MSAL application with a new application using the temporary password credential for client authentication',
       );
       msalApp = new GhaMsalAccessTokenProvider(
         httpClient,
         clientId,
         { clientSecret: passwordCredential.secretText || '' },
         tenantId,
-        instance
+        instance,
       );
       return acquireAccessTokenMsal(msalApp, resource, maxAttempts);
     }
     if (authMethod === 'az-acs-temporary-secret') {
       ghaCore.debug(
-        'Creating Azure Access Control Service client using the temporary password credential for client authentication'
+        'Creating Azure Access Control Service client using the temporary password credential for client authentication',
       );
       const acsClient = new GhaAzAcsClient(
         httpClient,
         clientId,
         passwordCredential.secretText || '',
         tenantId,
-        instance
+        instance,
       );
       return acquireAccessTokenAzAcs(acsClient, resource, maxAttempts);
     }

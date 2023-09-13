@@ -14,11 +14,11 @@ module.exports = (actionPath) => {
   const { name: actionPackageName, dependencies } =
     actionRequire(actionPackagePath);
   console.log(
-    `Checking for unfulfilled dependencies of package: ${actionPackageName}`
+    `Checking for unfulfilled dependencies of package: ${actionPackageName}`,
   );
   let unfulfilledDependencies = false;
   for (const dependencyName of Object.keys(
-    typeof dependencies === 'object' ? dependencies : {}
+    typeof dependencies === 'object' ? dependencies : {},
   )) {
     try {
       process.stdout.write(`- ${dependencyName}`);
