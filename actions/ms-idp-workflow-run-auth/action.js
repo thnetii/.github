@@ -5,11 +5,11 @@ const { AuthError } = require('@azure/msal-node');
 const { saveState } = require('@thnetii/gh-actions-core-helpers');
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
-const { getActionInputs, getGithubActionsToken } = require('./utils');
-const { GhaAzAcsClient } = require('./GhaAzAcsClient');
-const { GhaMsalAccessTokenProvider } = require('./GhaMsalAccessTokenProvider');
-const { generateCertificate } = require('./GhaOpenSslCertProvider');
-const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater');
+const { getActionInputs, getGithubActionsToken } = require('./utils.js');
+const { GhaAzAcsClient } = require('./GhaAzAcsClient.js');
+const { GhaMsalAccessTokenProvider } = require('./GhaMsalAccessTokenProvider.js');
+const { generateCertificate } = require('./GhaOpenSslCertProvider.js');
+const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater.js');
 
 /**
  * @param {GhaMsalAccessTokenProvider} msalApp

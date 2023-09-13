@@ -1,6 +1,6 @@
 const ghaCore = require('@actions/core');
 const { HttpClientError } = require('@actions/http-client');
-const { BearerCredentialHandler } = require('@actions/http-client/lib/auth');
+const { BearerCredentialHandler } = require('@actions/http-client/lib/auth.js');
 
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
@@ -9,7 +9,7 @@ const spnUrlSym = Symbol('#spnUrl');
 
 /**
  *
- * @param {import('./GhaMsalAccessTokenProvider').GhaMsalAccessTokenProvider} msalApp
+ * @param {import('./GhaMsalAccessTokenProvider.js').GhaMsalAccessTokenProvider} msalApp
  * @param {string} resource
  */
 async function createHttpClient(msalApp, resource) {
@@ -21,7 +21,7 @@ async function createHttpClient(msalApp, resource) {
 
 class GhaServicePrincipalUpdater {
   /**
-   * @param {import('./GhaMsalAccessTokenProvider').GhaMsalAccessTokenProvider} msalApp
+   * @param {import('./GhaMsalAccessTokenProvider.js').GhaMsalAccessTokenProvider} msalApp
    * @param {string} appId
    */
   constructor(msalApp, appId) {
@@ -42,7 +42,7 @@ class GhaServicePrincipalUpdater {
     const httpClient = await this[httpClientSym];
     const url = `${this[spnUrlSym]}?$select=id,appId,appDisplayName,keyCredentials`;
     /**
-     * @type {import('@actions/http-client/lib/interfaces').TypedResponse<
+     * @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<
      *  Required<Pick<import('@microsoft/microsoft-graph-types').ServicePrincipal, 'id' | 'appId' | 'appDisplayName' | 'keyCredentials'>>
      * >}
      */
@@ -89,7 +89,7 @@ class GhaServicePrincipalUpdater {
   }
 
   /**
-   * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider')['generateCertificate']>>} keyPair
+   * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider.js')['generateCertificate']>>} keyPair
    */
   async addCertificateKeyCredential(keyPair) {
     const httpClient = await this[httpClientSym];
@@ -119,7 +119,7 @@ class GhaServicePrincipalUpdater {
       'Updating Microsoft Graph service principal entity with modified keyCredentials list',
     );
     /**
-     * @type {import('@actions/http-client/lib/interfaces').TypedResponse<
+     * @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<
      *  Required<Pick<import('@microsoft/microsoft-graph-types').ServicePrincipal, 'keyCredentials'>>
      * >}
      */
@@ -170,7 +170,7 @@ class GhaServicePrincipalUpdater {
       passwordCredential:
         typeof passwordCredential === 'object' ? passwordCredential : {},
     };
-    /** @type {import('@actions/http-client/lib/interfaces').TypedResponse<Required<import('@microsoft/microsoft-graph-types').PasswordCredential>>} */
+    /** @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<Required<import('@microsoft/microsoft-graph-types').PasswordCredential>>} */
     const response = await httpClient.postJson(url, request);
     const { statusCode, result } = response;
     if (!result)

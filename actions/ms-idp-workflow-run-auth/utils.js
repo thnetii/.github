@@ -28,7 +28,7 @@ module.exports = {
         trimWhitespace: true,
       }) || undefined;
     const authMethod =
-      /** @type {import('./types').GhaActionAuthMethod} */ (
+      /** @type {import('./types.d.ts').GhaActionAuthMethod} */ (
         getInput('auth-method', {
           required: false,
           trimWhitespace: true,

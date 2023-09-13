@@ -8,7 +8,7 @@ const {
 
 const { buildNodeSystemOptions } = require('@thnetii/gh-actions-msal-client');
 
-const { onJwtToken } = require('./utils');
+const { onJwtToken } = require('./utils.js');
 
 const clientIdSym = Symbol('#clientId');
 

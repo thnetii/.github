@@ -2,7 +2,7 @@ const ghaCore = require('@actions/core');
 const { HttpClientError, HttpCodes } = require('@actions/http-client');
 const { AzureCloudInstance } = require('@azure/msal-node');
 
-const { onJwtToken } = require('./utils');
+const { onJwtToken } = require('./utils.js');
 
 const httpClientSym = Symbol('#httpClient');
 const clientIdSym = Symbol('#clientId');
@@ -35,7 +35,7 @@ class GhaAzAcsClient {
     const url = `${instance}/metadata/json/1?realm=${encodeURIComponent(
       realm,
     )}`;
-    /** @type {import('@actions/http-client/lib/interfaces').TypedResponse<import('./GhaAzAcsClient.types').AzAcsMetadataDocument>} */
+    /** @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<import('./GhaAzAcsClient.types.d.ts').AzAcsMetadataDocument>} */
     const resp = await httpClient.getJson(url);
     const { result, statusCode } = resp;
     if (!result)
@@ -100,7 +100,7 @@ class GhaAzAcsClient {
     } = resp;
     const body = await resp.readBody();
     /**
-     * @type {import('./GhaAzAcsClient.types').AzAcsOAuthEndpointHttpResponse}
+     * @type {import('./GhaAzAcsClient.types.d.ts').AzAcsOAuthEndpointHttpResponse}
      */
     const typedResponse = {
       statusCode: statusCode || HttpCodes.InternalServerError,
