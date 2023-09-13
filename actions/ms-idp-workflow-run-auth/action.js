@@ -7,9 +7,13 @@ const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
 const { getActionInputs, getGithubActionsToken } = require('./utils.js');
 const { GhaAzAcsClient } = require('./GhaAzAcsClient.js');
-const { GhaMsalAccessTokenProvider } = require('./GhaMsalAccessTokenProvider.js');
+const {
+  GhaMsalAccessTokenProvider,
+} = require('./GhaMsalAccessTokenProvider.js');
 const { generateCertificate } = require('./GhaOpenSslCertProvider.js');
-const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater.js');
+const {
+  GhaServicePrincipalUpdater,
+} = require('./GhaServicePrincipalUpdater.js');
 
 /**
  * @param {GhaMsalAccessTokenProvider} msalApp
