@@ -37,7 +37,8 @@ module.exports = (actionPath) => {
     console.log(`All dependencies are installed. Setup complete.`);
     return;
   }
-  const npmCommand = `npm clean-install --workspaces --omit=dev --omit=peer --omit=optional --no-audit --no-fund`;
+  const npmPath = path.normalize(path.join(process.execPath, '..', 'npm'));
+  const npmCommand = `"${npmPath}" clean-install --workspaces --omit=dev --omit=peer --omit=optional --no-audit --no-fund`;
   console.log(`[command]${npmCommand}`);
   execSync(npmCommand, {
     cwd: repoRootPath,
