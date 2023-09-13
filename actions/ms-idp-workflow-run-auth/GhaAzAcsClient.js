@@ -33,7 +33,7 @@ class GhaAzAcsClient {
     const instance = this[instanceSym];
 
     const url = `${instance}/metadata/json/1?realm=${encodeURIComponent(
-      realm
+      realm,
     )}`;
     /** @type {import('@actions/http-client/lib/interfaces').TypedResponse<import('./GhaAzAcsClient.types').AzAcsMetadataDocument>} */
     const resp = await httpClient.getJson(url);
@@ -41,13 +41,13 @@ class GhaAzAcsClient {
     if (!result)
       throw new HttpClientError(
         `Azure Access Control Service Metadata for realm '${realm}' not available.`,
-        statusCode
+        statusCode,
       );
     const { realm: realmFromMetadata, endpoints } = result;
     this[realmSym] = realmFromMetadata || realm;
     if (Array.isArray(endpoints)) {
       const oauthEndpoint = endpoints.find(
-        (i) => i.protocol === 'OAuth2' && i.usage === 'issuance'
+        (i) => i.protocol === 'OAuth2' && i.usage === 'issuance',
       );
       if (oauthEndpoint && oauthEndpoint.location)
         this.tokenEndpoint = oauthEndpoint.location;

@@ -14,7 +14,7 @@ function getRepoRef(repository) {
 const getScriptHelper = ({ github, context, inputs }) => ({
   async existsRef() {
     const { owner = context.repo.owner, repo = context.repo.repo } = getRepoRef(
-      inputs.repository
+      inputs.repository,
     );
     try {
       await github.rest.git.getRef({
@@ -64,12 +64,12 @@ module.exports = async (args) => {
     await exec(
       'git',
       ['checkout', '-B', 'tmp/create-rebase-branch-upstream'],
-      execOpts
+      execOpts,
     );
     await exec(
       'git',
       ['fetch', 'origin', `${branchName}:${branchName}`],
-      execOpts
+      execOpts,
     );
     await exec(
       'git',
@@ -79,7 +79,7 @@ module.exports = async (args) => {
         'tmp/create-rebase-branch-upstream',
         branchName,
       ],
-      execOpts
+      execOpts,
     );
   } else {
     await exec('git', ['checkout', '-B', branchName], execOpts);

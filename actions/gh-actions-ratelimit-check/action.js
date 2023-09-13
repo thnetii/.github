@@ -13,7 +13,7 @@ module.exports = async ({ core, github }) => {
     },
   } = response;
   core.info(
-    `Remaining rate-limit: ${rateLimit.remaining} / ${rateLimit.limit}`
+    `Remaining rate-limit: ${rateLimit.remaining} / ${rateLimit.limit}`,
   );
   core.setOutput('remaining', rateLimit.remaining);
   core.setOutput('limit', rateLimit.limit);

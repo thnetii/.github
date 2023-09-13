@@ -40,22 +40,22 @@ async function cleanup() {
       clientId,
       idToken,
       tenantId,
-      instance
+      instance,
     );
     const msgraphClient = new GhaServicePrincipalUpdater(msalApp, clientId);
     try {
       if (keyCredentialId) {
         ghaCore.info(
-          `Detected keyCredential previously registered for cleanup. keyId: ${keyCredentialId}`
+          `Detected keyCredential previously registered for cleanup. keyId: ${keyCredentialId}`,
         );
         await msgraphClient.removeKeyCredentialByKeyId(keyCredentialId);
       }
       if (passwordCredentialId) {
         ghaCore.info(
-          `Detected passwordCredential previously registered for cleanup. keyId: ${passwordCredentialId}`
+          `Detected passwordCredential previously registered for cleanup. keyId: ${passwordCredentialId}`,
         );
         await msgraphClient.removePasswordCredentialByKeyId(
-          passwordCredentialId
+          passwordCredentialId,
         );
       }
     } finally {

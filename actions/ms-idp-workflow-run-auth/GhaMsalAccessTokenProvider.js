@@ -40,7 +40,7 @@ class GhaMsalAccessTokenProvider {
     } else if (assertionInfo?.privateKey && assertionInfo?.thumbprint)
       config.auth.clientCertificate = assertionInfo;
     this.msalApp = new ConfidentialClientApplication(
-      buildAppConfiguration(config)
+      buildAppConfiguration(config),
     );
   }
 
@@ -53,7 +53,7 @@ class GhaMsalAccessTokenProvider {
       // eslint-disable-next-line no-param-reassign
       resource = this[clientIdSym];
       ghaCore.debug(
-        `No resource requested for access token audience, using client id instead.`
+        `No resource requested for access token audience, using client id instead.`,
       );
     }
     ghaCore.info(`Acquiring MSAL access token for resource: ${resource}`);

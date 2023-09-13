@@ -10,19 +10,19 @@ const {
 } = require('@thnetii/gh-actions-core-helpers');
 
 const tscProblemMatcherDef = tscJson.problemMatcher.find(
-  (m) => m.owner === 'tsc'
+  (m) => m.owner === 'tsc',
 );
 const tscProblemMatcherPattern = tscProblemMatcherDef?.pattern[0];
 if (!tscProblemMatcherDef || !tscProblemMatcherPattern) {
   throw new TypeError(
-    "TypeScript problem matcher from 'actions/setup-node' not available."
+    "TypeScript problem matcher from 'actions/setup-node' not available.",
   );
 }
 const tscProblemRegExp = new RegExp(tscProblemMatcherPattern.regexp, 'u');
 ghaCommand.issueCommand(
   'remove-matcher',
   { owner: tscProblemMatcherDef.owner },
-  ''
+  '',
 );
 const tscShortRegExp = /^(error|warning|info)\s+TS(\d+)\s*:\s*(.*)$/u;
 

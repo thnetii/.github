@@ -49,7 +49,7 @@ module.exports = {
    */
   async getGithubActionsToken(audience) {
     ghaCore.info(
-      `Requesting GitHub Actions ID token for audience: '${audience}'`
+      `Requesting GitHub Actions ID token for audience: '${audience}'`,
     );
     const idToken = await ghaCore.getIDToken(audience);
     return idToken;
