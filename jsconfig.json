@@ -5,6 +5,6 @@
   ],
   "compilerOptions": {
     "resolveJsonModule": true,
-    "exactOptionalPropertyTypes": false,
+    "exactOptionalPropertyTypes": false
   }
 }
