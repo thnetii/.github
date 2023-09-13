@@ -4,9 +4,7 @@
     "@tsconfig/node20/tsconfig.json"
   ],
   "compilerOptions": {
-    "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "exactOptionalPropertyTypes": false,
-    "ignoreDeprecations": "5.0"
+    "exactOptionalPropertyTypes": false
   }
 }
