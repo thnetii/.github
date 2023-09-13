@@ -8,7 +8,7 @@ const { createRequire } = require('node:module');
 /** @param {string} actionPath */
 module.exports = (actionPath) => {
   const repoRootPath = path.resolve(path.join(__dirname, '..', '..'));
-  const repoTmpPath = path.resolve(path.join(repoRootPath, 'tmp'));
+  const repoTmpPath = path.join(repoRootPath, 'tmp');
   const actionPackagePath = path.join(actionPath, 'package.json');
   const actionRequire = createRequire(actionPath);
   /** @type {{name: string; dependencies?: Record<string, string>}} */
@@ -43,6 +43,10 @@ module.exports = (actionPath) => {
   console.log(`[command]${npmCommand}`);
   execSync(npmCommand, {
     cwd: __dirname,
+    stdio: [process.stdin, process.stdout, process.stderr],
+  });
+  execSync(`ls -lah`, {
+    cwd: repoTmpPath,
     stdio: [process.stdin, process.stdout, process.stderr],
   });
 
