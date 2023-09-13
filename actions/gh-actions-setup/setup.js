@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable no-await-in-loop */
 
-const os = require('node:os');
 const { execSync, fork } = require('node:child_process');
 const path = require('node:path');
 const { createRequire } = require('node:module');
@@ -49,7 +48,9 @@ module.exports = (actionPath) => {
   });
 
   // eslint-disable-next-line node/no-missing-require
-  const npmPath = require.resolve('npm', { paths: [repoTmpLibPath, repoTmpPath] });
+  const npmPath = require.resolve('npm', {
+    paths: [repoTmpLibPath, repoTmpPath],
+  });
   console.log(`npm module located at: ${npmPath}`);
   const npmArgs = [
     'clean-install',
