@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/thnetii/.github#readme",
   "license": "MIT",
+  "main": "index.js",
   "engines": {
     "node": ">=20"
   },
