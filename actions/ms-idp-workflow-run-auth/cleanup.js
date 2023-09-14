@@ -3,11 +3,16 @@ const ghaCore = require('@actions/core');
 const ghaHelpers = require('@thnetii/gh-actions-core-helpers');
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
-const { getActionInputs, getGithubActionsToken } = require('./utils');
-const { GhaMsalAccessTokenProvider } = require('./GhaMsalAccessTokenProvider');
-const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater');
+const utilsModule = import('./utils.mjs');
+const GhaMsalAccessTokenProviderModule = import(
+  './GhaMsalAccessTokenProvider.mjs'
+);
+const GhaServicePrincipalUpdaterModule = import(
+  './GhaServicePrincipalUpdater.mjs'
+);
 
-function getState() {
+async function getState() {
+  const { getActionInputs } = await utilsModule;
   const keyCredentialId = ghaHelpers.getState('key-credential-id');
   const passwordCredentialId = ghaHelpers.getState('password-credential-id');
   return {
@@ -18,6 +23,12 @@ function getState() {
 }
 
 async function cleanup() {
+  const { getGithubActionsToken } = await utilsModule;
+  const { default: GhaMsalAccessTokenProvider } =
+    await GhaMsalAccessTokenProviderModule;
+  const { default: GhaServicePrincipalUpdater } =
+    await GhaServicePrincipalUpdaterModule;
+
   const {
     clientId,
     tenantId,
@@ -25,7 +36,7 @@ async function cleanup() {
     idTokenAudience,
     keyCredentialId,
     passwordCredentialId,
-  } = getState();
+  } = await getState();
   if (!keyCredentialId && !passwordCredentialId) {
     ghaCore.info('No temporary keyCredential registered for cleanup.');
     ghaCore.info('No temporary passwordCredential registered for cleanup.');

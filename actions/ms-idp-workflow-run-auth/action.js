@@ -1,22 +1,29 @@
 const ghaCore = require('@actions/core');
 const { HttpClientError } = require('@actions/http-client');
-const { AuthError } = require('@azure/msal-node');
+
+const msalNodeModule = import('@azure/msal-node');
 
 const { saveState } = require('@thnetii/gh-actions-core-helpers');
 const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
 
-const { getActionInputs, getGithubActionsToken } = require('./utils');
-const { GhaAzAcsClient } = require('./GhaAzAcsClient');
-const { GhaMsalAccessTokenProvider } = require('./GhaMsalAccessTokenProvider');
+const utilsModule = import('./utils.mjs');
+const GhaAzAcsClientModule = import('./GhaAzAcsClient.mjs');
+const GhaMsalAccessTokenProviderModule = import(
+  './GhaMsalAccessTokenProvider.mjs'
+);
 const { generateCertificate } = require('./GhaOpenSslCertProvider');
-const { GhaServicePrincipalUpdater } = require('./GhaServicePrincipalUpdater');
+
+const GhaServicePrincipalUpdaterModule = import(
+  './GhaServicePrincipalUpdater.mjs'
+);
 
 /**
- * @param {GhaMsalAccessTokenProvider} msalApp
+ * @param {InstanceType<Awaited<GhaMsalAccessTokenProviderModule>['default']>} msalApp
  * @param {string} resource
  * @param {number} maxAttempts
  */
 async function acquireAccessTokenMsal(msalApp, resource, maxAttempts) {
+  const { AuthError } = await msalNodeModule;
   let error;
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     let result;
@@ -57,11 +64,12 @@ async function acquireAccessTokenMsal(msalApp, resource, maxAttempts) {
 }
 
 /**
- * @param {GhaAzAcsClient} acsClient
+ * @param {InstanceType<Awaited<GhaAzAcsClientModule>['default']>} acsClient
  * @param {string} resource
  * @param {number} maxAttempts
  */
 async function acquireAccessTokenAzAcs(acsClient, resource, maxAttempts) {
+  const { AuthError } = await msalNodeModule;
   let error;
   let attempt;
   for (attempt = 0; attempt < maxAttempts; attempt += 1) {
@@ -110,6 +118,12 @@ async function acquireAccessTokenAzAcs(acsClient, resource, maxAttempts) {
  * @param {import('@actions/http-client').HttpClient} httpClient
  */
 async function acquireAccessToken(httpClient) {
+  const { getActionInputs, getGithubActionsToken } = await utilsModule;
+  const { default: GhaMsalAccessTokenProvider } =
+    await GhaMsalAccessTokenProviderModule;
+  const { default: GhaServicePrincipalUpdater } =
+    await GhaServicePrincipalUpdaterModule;
+  const { default: GhaAzAcsClient } = await GhaAzAcsClientModule;
   let maxAttempts = 1;
   const {
     clientId,
