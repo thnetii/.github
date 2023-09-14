@@ -1,3 +1,4 @@
+import { URL } from 'node:url';
 import { debug, info, isDebug } from '@actions/core';
 import {
   AzureCloudInstance,
@@ -21,15 +22,14 @@ class GhaMsalAccessTokenProvider {
    * @param {AzureCloudInstance | undefined} [instance]
    */
   constructor(httpClient, clientId, assertionInfo, tenantId, instance) {
+    const instanceUrl = new URL(instance || AzureCloudInstance.AzurePublic);
+    const authorityUrl = new URL(tenantId, instanceUrl);
     this[clientIdSym] = clientId;
     /** @type {import('@azure/msal-node').Configuration} */
     const config = {
       auth: {
         clientId,
-        azureCloudOptions: {
-          tenant: tenantId,
-          azureCloudInstance: instance || AzureCloudInstance.AzurePublic,
-        },
+        authority: authorityUrl.toString(),
       },
       system: buildNodeSystemOptions(httpClient),
     };
