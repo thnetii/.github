@@ -123,6 +123,4 @@ class GhaAzAcsClient {
   }
 }
 
-export default {
-  GhaAzAcsClient,
-};
+export default GhaAzAcsClient;

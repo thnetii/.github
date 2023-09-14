@@ -9,7 +9,7 @@ const spnUrlSym = Symbol('#spnUrl');
 
 /**
  *
- * @param {InstanceType<import('./GhaMsalAccessTokenProvider.mjs')['default']['GhaMsalAccessTokenProvider']>} msalApp
+ * @param {InstanceType<import('./GhaMsalAccessTokenProvider.mjs')['default']>} msalApp
  * @param {string} resource
  */
 async function createHttpClient(msalApp, resource) {
@@ -21,7 +21,7 @@ async function createHttpClient(msalApp, resource) {
 
 class GhaServicePrincipalUpdater {
   /**
-   * @param {InstanceType<import('./GhaMsalAccessTokenProvider.mjs')['default']['GhaMsalAccessTokenProvider']>} msalApp
+   * @param {InstanceType<import('./GhaMsalAccessTokenProvider.mjs')['default']>} msalApp
    * @param {string} appId
    */
   constructor(msalApp, appId) {
@@ -183,6 +183,4 @@ class GhaServicePrincipalUpdater {
   }
 }
 
-export default {
-  GhaServicePrincipalUpdater,
-};
+export default GhaServicePrincipalUpdater;

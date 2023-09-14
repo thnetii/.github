@@ -18,7 +18,7 @@ const GhaServicePrincipalUpdaterModule = import(
 );
 
 /**
- * @param {InstanceType<Awaited<GhaMsalAccessTokenProviderModule>['default']['GhaMsalAccessTokenProvider']>} msalApp
+ * @param {InstanceType<Awaited<GhaMsalAccessTokenProviderModule>['default']>} msalApp
  * @param {string} resource
  * @param {number} maxAttempts
  */
@@ -64,7 +64,7 @@ async function acquireAccessTokenMsal(msalApp, resource, maxAttempts) {
 }
 
 /**
- * @param {InstanceType<Awaited<GhaAzAcsClientModule>['default']['GhaAzAcsClient']>} acsClient
+ * @param {InstanceType<Awaited<GhaAzAcsClientModule>['default']>} acsClient
  * @param {string} resource
  * @param {number} maxAttempts
  */
@@ -119,15 +119,11 @@ async function acquireAccessTokenAzAcs(acsClient, resource, maxAttempts) {
  */
 async function acquireAccessToken(httpClient) {
   const { getActionInputs, getGithubActionsToken } = await utilsModule;
-  const {
-    default: { GhaMsalAccessTokenProvider },
-  } = await GhaMsalAccessTokenProviderModule;
-  const {
-    default: { GhaServicePrincipalUpdater },
-  } = await GhaServicePrincipalUpdaterModule;
-  const {
-    default: { GhaAzAcsClient },
-  } = await GhaAzAcsClientModule;
+  const { default: GhaMsalAccessTokenProvider } =
+    await GhaMsalAccessTokenProviderModule;
+  const { default: GhaServicePrincipalUpdater } =
+    await GhaServicePrincipalUpdaterModule;
+  const { default: GhaAzAcsClient } = await GhaAzAcsClientModule;
   let maxAttempts = 1;
   const {
     clientId,

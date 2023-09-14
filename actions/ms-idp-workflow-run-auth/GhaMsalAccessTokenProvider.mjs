@@ -72,6 +72,4 @@ class GhaMsalAccessTokenProvider {
   }
 }
 
-export default {
-  GhaMsalAccessTokenProvider,
-};
+export default GhaMsalAccessTokenProvider;

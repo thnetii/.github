@@ -24,12 +24,10 @@ async function getState() {
 
 async function cleanup() {
   const { getGithubActionsToken } = await utilsModule;
-  const {
-    default: { GhaMsalAccessTokenProvider },
-  } = await GhaMsalAccessTokenProviderModule;
-  const {
-    default: { GhaServicePrincipalUpdater },
-  } = await GhaServicePrincipalUpdaterModule;
+  const { default: GhaMsalAccessTokenProvider } =
+    await GhaMsalAccessTokenProviderModule;
+  const { default: GhaServicePrincipalUpdater } =
+    await GhaServicePrincipalUpdaterModule;
 
   const {
     clientId,
