@@ -1,14 +1,14 @@
-const ghaCore = require('@actions/core');
-const {
+import { debug, info, isDebug } from '@actions/core';
+import {
   AzureCloudInstance,
   AuthError,
   buildAppConfiguration,
   ConfidentialClientApplication,
-} = require('@azure/msal-node');
+} from '@azure/msal-node';
 
-const { buildNodeSystemOptions } = require('@thnetii/gh-actions-msal-client');
+import { buildNodeSystemOptions } from '@thnetii/gh-actions-msal-client';
 
-const { onJwtToken } = require('./utils');
+import { onJwtToken } from './utils.mjs';
 
 const clientIdSym = Symbol('#clientId');
 
@@ -52,26 +52,26 @@ class GhaMsalAccessTokenProvider {
     if (!resource) {
       // eslint-disable-next-line no-param-reassign
       resource = this[clientIdSym];
-      ghaCore.debug(
+      debug(
         `No resource requested for access token audience, using client id instead.`,
       );
     }
-    ghaCore.info(`Acquiring MSAL access token for resource: ${resource}`);
+    info(`Acquiring MSAL access token for resource: ${resource}`);
     const authResult = await msalApp.acquireTokenByClientCredential({
       scopes: [`${resource || this[clientIdSym]}/.default`],
     });
     if (!authResult)
       throw new AuthError(undefined, 'Authentication result is null');
-    ghaCore.info('Sucessfully acquired MSAL access token.');
+    info('Sucessfully acquired MSAL access token.');
     const { accessToken, scopes } = authResult;
     onJwtToken(accessToken);
-    if (ghaCore.isDebug()) {
-      for (const scope of scopes) ghaCore.debug(`Available scope: ${scope}`);
+    if (isDebug()) {
+      for (const scope of scopes) debug(`Available scope: ${scope}`);
     }
     return authResult;
   }
 }
 
-module.exports = {
+export default {
   GhaMsalAccessTokenProvider,
 };

@@ -1,15 +1,15 @@
-const ghaCore = require('@actions/core');
-const { HttpClientError } = require('@actions/http-client');
-const { BearerCredentialHandler } = require('@actions/http-client/lib/auth');
+import { debug, info } from '@actions/core';
+import { HttpClientError } from '@actions/http-client';
+import { BearerCredentialHandler } from '@actions/http-client/lib/auth.js';
 
-const { GhaHttpClient } = require('@thnetii/gh-actions-http-client');
+import { GhaHttpClient } from '@thnetii/gh-actions-http-client';
 
 const httpClientSym = Symbol('#httpClient');
 const spnUrlSym = Symbol('#spnUrl');
 
 /**
  *
- * @param {import('./GhaMsalAccessTokenProvider').GhaMsalAccessTokenProvider} msalApp
+ * @param {InstanceType<import('./GhaMsalAccessTokenProvider.mjs')['default']['GhaMsalAccessTokenProvider']>} msalApp
  * @param {string} resource
  */
 async function createHttpClient(msalApp, resource) {
@@ -21,7 +21,7 @@ async function createHttpClient(msalApp, resource) {
 
 class GhaServicePrincipalUpdater {
   /**
-   * @param {import('./GhaMsalAccessTokenProvider').GhaMsalAccessTokenProvider} msalApp
+   * @param {InstanceType<import('./GhaMsalAccessTokenProvider.mjs')['default']['GhaMsalAccessTokenProvider']>} msalApp
    * @param {string} appId
    */
   constructor(msalApp, appId) {
@@ -36,13 +36,13 @@ class GhaServicePrincipalUpdater {
   }
 
   async getKeyCredentials() {
-    ghaCore.debug(
+    debug(
       'Retrieving all keyCredentials registered on Microsoft Graph service principal entity.',
     );
     const httpClient = await this[httpClientSym];
     const url = `${this[spnUrlSym]}?$select=id,appId,appDisplayName,keyCredentials`;
     /**
-     * @type {import('@actions/http-client/lib/interfaces').TypedResponse<
+     * @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<
      *  Required<Pick<import('@microsoft/microsoft-graph-types').ServicePrincipal, 'id' | 'appId' | 'appDisplayName' | 'keyCredentials'>>
      * >}
      */
@@ -61,14 +61,12 @@ class GhaServicePrincipalUpdater {
    */
   async removeKeyCredentialByKeyId(keyId) {
     const httpClient = await this[httpClientSym];
-    ghaCore.info(
-      'Removing certificate from Microsoft Graph service principal entity',
-    );
+    info('Removing certificate from Microsoft Graph service principal entity');
     const { result: spnEntity } = await this.getKeyCredentials();
     let { keyCredentials } = spnEntity;
     if (!Array.isArray(keyCredentials)) keyCredentials = [];
 
-    ghaCore.debug(
+    debug(
       `Removing keyCredential with keyId '${keyId}' from registered keyCredentials.`,
     );
     const keyIdx = keyCredentials.findIndex((c) => c.keyId === keyId);
@@ -78,7 +76,7 @@ class GhaServicePrincipalUpdater {
       delete existingKeyCredential.key;
     }
 
-    ghaCore.debug(
+    debug(
       'Updating Microsoft Graph service principal entity with modified keyCredentials list',
     );
     // @ts-ignore
@@ -89,18 +87,16 @@ class GhaServicePrincipalUpdater {
   }
 
   /**
-   * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider')['generateCertificate']>>} keyPair
+   * @param {Awaited<ReturnType<import('./GhaOpenSslCertProvider.js')['generateCertificate']>>} keyPair
    */
   async addCertificateKeyCredential(keyPair) {
     const httpClient = await this[httpClientSym];
-    ghaCore.info(
-      'Adding certificate to Microsoft Graph service principal entity',
-    );
+    info('Adding certificate to Microsoft Graph service principal entity');
     const { result: spnEntity } = await this.getKeyCredentials();
     let { keyCredentials } = spnEntity;
     if (!Array.isArray(keyCredentials)) keyCredentials = [];
 
-    ghaCore.debug('Adding certificate to list of registered keyCredentials');
+    debug('Adding certificate to list of registered keyCredentials');
     const thumbprint = keyPair.thumbprint.toString('base64');
     for (const existingKeyCredential of keyCredentials) {
       delete existingKeyCredential.key;
@@ -115,11 +111,11 @@ class GhaServicePrincipalUpdater {
       usage: 'Verify',
     });
 
-    ghaCore.debug(
+    debug(
       'Updating Microsoft Graph service principal entity with modified keyCredentials list',
     );
     /**
-     * @type {import('@actions/http-client/lib/interfaces').TypedResponse<
+     * @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<
      *  Required<Pick<import('@microsoft/microsoft-graph-types').ServicePrincipal, 'keyCredentials'>>
      * >}
      */
@@ -139,7 +135,7 @@ class GhaServicePrincipalUpdater {
       throw new Error(
         'Failed to update service principal with new key credential',
       );
-    ghaCore.info(
+    info(
       `Certificate added to service principal entity. keyId: ${keyCredential.keyId}`,
     );
     return keyCredential;
@@ -150,7 +146,7 @@ class GhaServicePrincipalUpdater {
    */
   async removePasswordCredentialByKeyId(keyId) {
     const httpClient = await this[httpClientSym];
-    ghaCore.info(
+    info(
       'Removing password credential from Microsoft Graph service principal entity',
     );
     const url = `${this[spnUrlSym]}/removePassword`;
@@ -162,7 +158,7 @@ class GhaServicePrincipalUpdater {
    */
   async addPasswordCredential(passwordCredential) {
     const httpClient = await this[httpClientSym];
-    ghaCore.info(
+    info(
       'Adding password credential to Microsoft Graph service principal entity',
     );
     const url = `${this[spnUrlSym]}/addPassword`;
@@ -170,7 +166,7 @@ class GhaServicePrincipalUpdater {
       passwordCredential:
         typeof passwordCredential === 'object' ? passwordCredential : {},
     };
-    /** @type {import('@actions/http-client/lib/interfaces').TypedResponse<Required<import('@microsoft/microsoft-graph-types').PasswordCredential>>} */
+    /** @type {import('@actions/http-client/lib/interfaces.js').TypedResponse<Required<import('@microsoft/microsoft-graph-types').PasswordCredential>>} */
     const response = await httpClient.postJson(url, request);
     const { statusCode, result } = response;
     if (!result)
@@ -187,6 +183,6 @@ class GhaServicePrincipalUpdater {
   }
 }
 
-module.exports = {
+export default {
   GhaServicePrincipalUpdater,
 };
