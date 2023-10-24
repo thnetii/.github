@@ -83,7 +83,7 @@ jobs:
         uses: actions/checkout@v4
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with: ${{ fromJSON(inputs.setup-node-parameters) }}
       - name: Run npm install command
         uses: thnetii/.github/actions/gh-actions-npm@main
@@ -103,7 +103,7 @@ jobs:
         uses: actions/checkout@v4
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with: ${{ fromJSON(inputs.setup-node-parameters) }}
       - name: Run npm install command
         uses: thnetii/.github/actions/gh-actions-exec@main
@@ -127,7 +127,7 @@ jobs:
         uses: actions/checkout@v4
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with: ${{ fromJSON(inputs.setup-node-parameters) }}
       - name: Run npm install command
         uses: thnetii/.github/actions/gh-actions-exec@main
@@ -151,7 +151,7 @@ jobs:
         uses: actions/checkout@v4
         with: ${{ fromJSON(inputs.checkout-parameters) }}
       - name: Setup Github Actions for Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with: ${{ fromJSON(inputs.setup-node-parameters) }}
       - name: Run npm install command
         uses: thnetii/.github/actions/gh-actions-exec@main
